@@ -16,5 +16,9 @@
  */
 extern void dmps(unsigned int, unsigned int);
 
+/**
+ * Formate le disque courrant (met les secteurs à 0).
+ */ 
+extern void frmt();
 
 #endif
