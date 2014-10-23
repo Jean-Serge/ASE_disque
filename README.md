@@ -1,4 +1,4 @@
 ASE_disque
 ==========
-Jean-Serge Monbailly
-Arthur Dewarumez
+Compilation :
+	Modifier ROOTDIR dans le Makefile 
