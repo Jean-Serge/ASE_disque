@@ -4,7 +4,7 @@
 
    hardware.h
 
-   Interface de la bibliothèque de simulation du matériel. 
+   Interface de la bibliothèque de simulation du matériel.
 
 */
 
@@ -35,9 +35,9 @@ extern enum cpu_mode_e currentMode;
 
 /**
  * prototype des fonctions-interruptions.
- * une interruption ne recoit aucun paramêtre "d'appel", 
+ * une interruption ne recoit aucun paramêtre "d'appel",
  * une interruption ne retourne aucun resultat, mais
- * sa terminaison restaure le contexte d'exécution du programme interrompu. 
+ * sa terminaison restaure le contexte d'exécution du programme interrompu.
  */
 typedef void (*func_irq)(void);
 
@@ -47,13 +47,13 @@ typedef void (*func_irq)(void);
  *          l'initialisation définit le matériel conformément aux spécifications
  *          fournies par le fichier dont le nom est "fileconfig".
  *          retourne 0 en cas de problème lors de l'initialisation.
- */ 
+ */
 extern int init_hardware(const char *fileconfig);
 
 /**
- *      IRQVECTOR 
+ *      IRQVECTOR
  *          donne la base d'un tableau de pointeur de fonction du type
- *          func_irq. la fonction IRQVECTOR[n]() est appelée lorsque 
+ *          func_irq. la fonction IRQVECTOR[n]() est appelée lorsque
  *          l'interuption de niveau n est déclanchée par le matériel.
  */
 #define IRQ_VECOTR_SIZE 256
@@ -69,15 +69,15 @@ extern int SYSTICKDURATION;	/* microseconde entre les SYSTICK   */
 /* n'utilisez pas ces variables*/
 extern unsigned char ** HDA_masterbufferaddress, **HDB_masterbufferaddress;
 /* préférez ces #define MASTERBUFFER et SLAVEBUFFER */
-#define MASTERBUFFER (*HDA_masterbufferaddress) 
-#define SLAVEBUFFER  (*HDB_masterbufferaddress) 
+#define MASTERBUFFER (*HDA_masterbufferaddress)
+#define SLAVEBUFFER  (*HDB_masterbufferaddress)
 
 /**
  *      BASEADDRESS_RAM
  *          variable associée à adresse de base de la mémoire globale
- *          de la machine. Cette mémoire est commune à tout les programmes 
- *          qui utilisent la librairie sur la même machine.  
- *          
+ *          de la machine. Cette mémoire est commune à tout les programmes
+ *          qui utilisent la librairie sur la même machine.
+ *
  */
 extern  unsigned char *baseGlobalMem;       /* n'utilisez pas cette variable */
 #define BASEADDRESS_RAM baseGlobalMem /* préférez ce #define BASEADDRESS_RAM */
@@ -86,7 +86,7 @@ extern  unsigned char *baseGlobalMem;       /* n'utilisez pas cette variable */
  *      int _in(int port);
  *          lecture du contenu du registre matériel n° "port".
  *          retourne la valeur lue.
- */ 
+ */
 int     _in(int port);
 
 /**
@@ -104,7 +104,7 @@ void    _sleep(int irq_level);
 
 /**
  *      void _mask(int irqLevel);
- *          - cache au microprocesseur l'occurence d'interruptions 
+ *          - cache au microprocesseur l'occurence d'interruptions
  *          de niveau inférieure à irqLevel.
  * 			- 16ème bit à 0 : passage en mode protégé
  * 			- 16ème bit à 1 : passage en mode user
@@ -120,4 +120,3 @@ void     _mask(int irq_level);
 void     _int(int irqLevel);
 
 #endif
-
