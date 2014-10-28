@@ -26,6 +26,9 @@ all: $(BINARIES) $(OBJECTS)
 create-disk: drive create_disk.c
 	$(CC) $(CFLAGS) -o create-disk.bin drive.o create_disk.c ${LIBS}
 
+dmps: drive dmps.c
+	$(CC) $(CFLAGS) -o dmps.bin drive.o dmps.c ${LIBS}
+
 drive: drive.c drive.h
 	$(CC) $(CFLAGS) -o drive.o -c drive.c ${INCDIR}
 
