@@ -35,6 +35,6 @@ extern struct disk_info_s *get_disk_info();
 
 extern void _out_16bits(unsigned int val, unsigned int addr);
 
-extern unsigned int _in_16bits(unsigned int addr):
+extern unsigned int _in_16bits(unsigned int addr);
 
 #endif
