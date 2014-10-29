@@ -18,8 +18,8 @@ void empty_fun(){return;}
  */
 void _out_16bits(unsigned int val, unsigned int addr){
 	/* TODO : Vérifier que la valeur et addr sont stocké sur 16bits*/
-	_out(addr, val>>8);
-	_out(addr+1,(val << 8) >> 8);
+	_out(addr, val >> 8);
+	_out(addr+1,val & 0x0F);
 }
 
 /*
@@ -34,12 +34,10 @@ unsigned int _in_16bits(unsigned int addr){
 }
 
 /********************* Gestion des informations du disque *********************/
-struct disk_info_s *get_disk_info(){
-	if(!d_info)
-		set_disk_info();
-	return d_info;
-}
-
+/*
+  Initialise la structure contenant les informations du disque.
+  Ne pas appeler cette fonction avant le premier appel à mkhd().
+*/
 void set_disk_info(){
 	d_info = (struct disk_info_s *)malloc(sizeof(struct disk_info_s));
 	_out(HDA_CMDREG, CMD_DSKINFO);
@@ -48,6 +46,15 @@ void set_disk_info(){
 	d_info->sec_size = _in_16bits(HDA_DATAREGS+4);
 }
 
+/*
+  Retourne la structure contenant les informations du disque.
+  Ne pas appeler cette fonction avant le premier appel à mkhd().
+*/
+struct disk_info_s *get_disk_info(){
+	if(!d_info)
+		set_disk_info();
+	return d_info;
+}
 
 /***************************  Utilitaire multiples  ***************************/
 /*
