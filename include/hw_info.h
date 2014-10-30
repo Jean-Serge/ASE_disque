@@ -6,7 +6,7 @@
 #define HDA_IRQ        14       /* Interruption du disque */
 #define NB_HW_IRQ       16       /* nombre d'iRQ */
 #define TIMER_IRQ       2        /* Niveau dinterruption de l'horloge */
-#define HDA_SECTORSIZE  32       /* Nombres d'octets constituant un bloc */
+#define HDA_SECTORSIZE  256       /* Nombres d'octets constituant un bloc */
 
 #define xHDA_STPS       2        /* nombre de SYSTICK pour changer de secteur */
 #define HDA_STPC        1        /* nombre de SYSTICK pour changer de piste */
