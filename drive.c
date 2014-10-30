@@ -94,3 +94,16 @@ void mkhd(){
 	_mask(1);
 	return;
 }
+
+/*************************  Commandes de bas niveau ***************************/
+void move_head(unsigned int cyl, unsigned int sec){
+	/* Saisie de l'addresse où doit se positionner la tête de lecture */
+	_out_16bits(cyl, HDA_DATAREGS);
+	_out_16bits(sec, HDA_DATAREGS+2);
+
+	/* Ajout de l'ordre dans le registre de commande */
+	_out(HDA_CMDREG, CMD_SEEK);
+
+	/* Attente de l'IRQ */
+	_sleep(HDA_IRQ);
+}
