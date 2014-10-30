@@ -65,10 +65,14 @@ struct disk_info_s *get_disk_info(){
   du disque.
   Pour ne pas vérifier une des coordonnées, il suffit de passer une valeur
   inférieur à 0.
+  Si cyl et sec sont tous les deux inférieur à 0, 0 est retourné.
  */
 int is_correct_coordinates(int sec, int cyl){
 	if(!d_info){
 		set_disk_info();
+	}
+	if(sec < 0 && cyl < 0){
+		return 0;
 	}
 	return ((cyl<0)?1:((cyl<d_info->nb_cyl)?1:0))&
 	       ((sec<0)?1:((sec<d_info->nb_sec)?1:0));
