@@ -9,6 +9,7 @@
 #define SUCCESS  0
 #define ERR_COOR 1
 #define ERR_OPT  2
+#define ERR_NEG  3
 
 void dmps(unsigned int cyl, unsigned int sec, unsigned char *buffer){
 	struct disk_info_s *dinfo = get_disk_info();
@@ -78,6 +79,10 @@ int main(int argc, char **argv){
 			fprintf(stderr, "Saisissez « dmps -h » pour plus d'informations.");
 			exit(ERR_OPT);
 		}
+	}
+	if(sec < 0 || cyl < 0){
+		fprintf(stderr, "Les adresses des secteurs et cylindre doivent êtres supérieur ou égales à 0.\n");
+		exit(ERR_NEG);
 	}
 
 	mkhd();
