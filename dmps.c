@@ -20,15 +20,7 @@ void dmps(unsigned int cyl, unsigned int sec, unsigned char *buffer){
 		exit(ERR_COOR);
 	}
 
-	/* Saisie de l'addresse où doit se positionner la tête de lecture */
-	_out_16bits(cyl, HDA_DATAREGS);
-	_out_16bits(sec, HDA_DATAREGS+2);
-
-	/* Ajout de l'ordre dans le registre de commande */
-	_out(HDA_CMDREG, CMD_SEEK);
-
-	/* Attente de l'IRQ */
-	_sleep(HDA_IRQ);
+	move_head(cyl, sec);
 
 	/* Demande de données du disque */
 	_out_16bits(HDA_DATAREGS, 1);
