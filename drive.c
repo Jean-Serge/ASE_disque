@@ -111,3 +111,54 @@ void move_head(unsigned int cyl, unsigned int sec){
 	/* Attente de l'IRQ */
 	_sleep(HDA_IRQ);
 }
+
+/***************** Fonction d'écriture et lecture de secteur ******************/
+/*
+  Lit le secteur à l'adresse cylinder × sector et le stocke dans le buffer
+  buffer.
+  Ne vérifie pas que les adresse sont bonne.
+*/
+void read_sector(unsigned int cylinder, unsigned int sector,
+				 unsigned char *buffer){
+	int i = 0;
+	move_head(cylinder, sector);
+
+	/* Demande de données du disque */
+	_out_16bits(HDA_DATAREGS, 1);
+	_out(HDA_CMDREG, CMD_READ);
+
+	/* Attente de l'IRQ */
+	_sleep(HDA_IRQ);
+	for(; i < HDA_SECTORSIZE; i++)
+		buffer[i] = MASTERBUFFER[i];
+}
+
+void write_sector(unsigned int cylinder, unsigned int sector,
+				  const unsigned char *buffer){
+	int i = 0;
+
+	move_head(cylinder, sector);
+
+	for(; i < HDA_SECTORSIZE; i++){
+		MASTERBUFFER[i] = buffer[i];
+		printf("%x ", MASTERBUFFER[i]);
+	}
+	_out_16bits(HDA_DATAREGS, 1);
+	_out(HDA_CMDREG, CMD_WRITE);
+	_sleep(HDA_IRQ);
+}
+
+void format_sector(unsigned int cylinder, unsigned int sector,
+				   unsigned int nsector, unsigned int value){
+	unsigned char *buffer;
+	int i = 0;
+	buffer = (unsigned char *)malloc(HDA_SECTORSIZE * sizeof(unsigned char));
+
+	for(; i < HDA_SECTORSIZE; i++){
+		buffer[i] = value;
+	}
+	for(i = 0; i < nsector; i++){
+		printf("Cyl = %d, sector = %d\n", cylinder, sector + i);
+		write_sector(cylinder, sector + i, buffer);
+	}
+}

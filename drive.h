@@ -39,4 +39,13 @@ extern unsigned int _in_16bits(unsigned int addr);
 
 extern void move_head(unsigned int cyl, unsigned int sec);
 
+extern void read_sector(unsigned int cylinder, unsigned int sector,
+                        unsigned char *buffer);
+
+extern void write_sector(unsigned int cylinder, unsigned int sector,
+                         const unsigned char *buffer);
+
+extern void format_sector(unsigned int cylinder, unsigned int sector,
+                          unsigned int nsector, unsigned int value);
+
 #endif
