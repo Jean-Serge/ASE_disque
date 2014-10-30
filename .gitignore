@@ -32,3 +32,6 @@
 # Emacs
 .\#*
 *~
+
+# Other
+tpfs/
