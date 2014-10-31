@@ -2,9 +2,14 @@ ASE_disque
 ==========
 Jean-Serge Monbailly
 Arthur Dewarumez
+
 Fichiers présent :
 ==================
 README.md     : le fichier README
+drive.[c|h]   : le bibliothèque de gestion de disque
+dmps.c        : les sources du programme d'affichage de secteur du disque
+frmt.c        : les sources du programme de formattage du disque.
+Makefile      : le makefile
 
 
 Pour compiler :
@@ -15,6 +20,9 @@ Pour compiler :
 
 	Pour compiler le programme d'affichage de secteur du disque :
 		make dmps
+
+	Pour compiler le programme de formattage de disque :
+		make frmt
 
 	Pour compiler le programme de test des fonctions de gestion du MBR :
 		make test_mbr
