@@ -58,11 +58,12 @@ extern void format_sector(unsigned int cylinder, unsigned int sector,
 /******************************* Gestion du MBR *******************************/
 #define MAX_VOLUME 8
 #define MBR_MAGIC 0xA1E
+
 enum vol_type{BASE, ANNEXE, OTHER};
 
 struct volume_s{
 	int start_cyl;
-	int start_sect;
+	int start_sec;
 	int nsector;
 	enum vol_type type;
 };
