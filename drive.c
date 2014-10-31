@@ -1,9 +1,9 @@
 #include "drive.h"
 
 #define ST_MBR_MAGIC   0
-#define ST_MBR_NVOL    3
-#define ST_MBR_VOL     4
-#define LN_MBR_VOL     7
+#define ST_MBR_NVOL    2
+#define ST_MBR_VOL     3
+#define LN_MBR_VOL     5
 
 static struct disk_info_s *d_info = NULL;
 static struct mbr_s *mbr = NULL;
@@ -181,8 +181,7 @@ void init_mbr_s(){
 	read_sector(0, 0, buffer);
 
 	/* Lecture du magic */
-	mbr->magic = (buffer[ST_MBR_MAGIC] << 16) + (buffer[ST_MBR_MAGIC+1]<<8);
-	mbr->magic += buffer[ST_MBR_MAGIC+2];
+	mbr->magic = (buffer[ST_MBR_MAGIC] << 8) + (buffer[ST_MBR_MAGIC+1]);
 
 	/* Lecture du nombre de volume créer */
 	mbr->nvol = buffer[ST_MBR_NVOL];
@@ -194,10 +193,10 @@ void init_mbr_s(){
 	it_buf = ST_MBR_VOL;
 	for(i = 0; i < mbr->nvol; i++){
 		vol = mbr->volume+i;
-		vol->start_cyl = (buffer[it_buf] << 8) + buffer[it_buf+1];
-		vol->start_sec = (buffer[it_buf+2] << 8) + buffer[it_buf+3];
-		vol->nsector = (buffer[it_buf+4] << 8) + buffer[it_buf+5];
-		switch(buffer[it_buf+6]){
+		vol->start_cyl = buffer[it_buf];
+		vol->start_sec = buffer[it_buf+1];
+		vol->nsector = (buffer[it_buf+2] << 8) + buffer[it_buf+3];
+		switch(buffer[it_buf+4]){
 		case 0:
 			vol->type = BASE;
 			break;
@@ -210,6 +209,7 @@ void init_mbr_s(){
 		}
 		it_buf += LN_MBR_VOL;
 	}
+	i+=1;
 	free(buffer);
 }
 
@@ -217,4 +217,43 @@ struct mbr_s *get_mbr(){
 	if(!mbr)
 		init_mbr_s();
 	return mbr;
+}
+
+void save_mbr(){
+	unsigned char *buffer = (unsigned char *)calloc(HDA_SECTORSIZE,
+	                                                sizeof(unsigned char));
+	int it_buf;
+	int i;
+	struct volume_s *vol;
+
+	/* Enregistrement du MAGIC */
+	buffer[ST_MBR_MAGIC] = mbr->magic>>8;
+	buffer[ST_MBR_MAGIC] = (mbr->magic<<8)>>8;
+
+	/* Enregistrement du nombre de volume */
+	buffer[ST_MBR_MAGIC] = mbr->nvol;
+
+	/* Enrefistrement des volumes */
+	it_buf = ST_MBR_VOL;
+	for(i = 0; i < mbr->nvol; i++){
+		vol = mbr->volume+i;
+		buffer[it_buf] = vol->start_cyl;
+		buffer[it_buf+1] = vol->start_sec;
+		buffer[it_buf+2] = vol->nsector>>8;
+		buffer[it_buf+3] = (vol->nsector<<8)>>8;
+		if(vol->type == BASE){
+			buffer[it_buf+4] = 0;
+		}
+		else{
+			if(vol->type == BASE){
+				buffer[it_buf+4] = 1;
+			}
+			else{
+				buffer[it_buf+4] = 2;
+			}
+		}
+		it_buf += LN_MBR_VOL;
+	}
+
+	free(buffer);
 }
