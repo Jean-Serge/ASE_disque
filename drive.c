@@ -175,6 +175,7 @@ void init_mbr_s(){
 	unsigned char *buffer;
 	int i;
 	int it_buf;
+	struct volume_s *vol;
 	buffer = (unsigned char *)malloc(sizeof(unsigned char) * HDA_SECTORSIZE);
 	mbr = (struct mbr_s *)malloc(sizeof(struct mbr_s));
 	read_sector(0, 0, buffer);
@@ -190,14 +191,23 @@ void init_mbr_s(){
 
 	/* Lecture des informations sur les volumes */
 	mbr->volume = (struct volume_s *)malloc(sizeof(struct volume_s)*MAX_VOLUME);
-	struct volume_s vol;
 	it_buf = ST_MBR_VOL;
 	for(i = 0; i < mbr->nvol; i++){
-		vol = mbr->volume[i];
+		vol = mbr->volume+i;
 		vol->start_cyl = (buffer[it_buf] << 8) + buffer[it_buf+1];
 		vol->start_sec = (buffer[it_buf+2] << 8) + buffer[it_buf+3];
 		vol->nsector = (buffer[it_buf+4] << 8) + buffer[it_buf+5];
-		vol->type = buffer[it_buf+6];
+		switch(buffer[it_buf+6]){
+		case 0:
+			vol->type = BASE;
+			break;
+		case 1:
+			vol->type = ANNEXE;
+			break;
+		case 2:
+			vol->type = OTHER;
+			break;
+		}
 		it_buf += LN_MBR_VOL;
 	}
 	free(buffer);
