@@ -36,7 +36,7 @@ drive: drive.c drive.h
 	$(CC) $(CFLAGS) -o drive.o -c drive.c ${INCDIR}
 
 test_mbr: drive
-	$(CC) $(CFLAGS) -o test_mbr drive.o test_mbr.c ${LIBS}
+	$(CC) $(CFLAGS) -o test_mbr.bin drive.o test_mbr.c ${LIBS}
 
 
 ###------------------------------
