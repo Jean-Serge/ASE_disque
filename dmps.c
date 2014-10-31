@@ -102,6 +102,7 @@ int main(int argc, char **argv){
 	for(; i < HDA_SECTORSIZE; i++){
 		printf(str_print, buffer[i]);
 	}
+	free(buffer);
 
 	exit(SUCCESS);
 }
