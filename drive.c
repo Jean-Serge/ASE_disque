@@ -1,6 +1,12 @@
 #include "drive.h"
 
+#define ST_MBR_MAGIC   0
+#define ST_MBR_NVOL    3
+#define ST_MBR_VOL     4
+#define LN_MBR_VOL     7
+
 static struct disk_info_s *d_info = NULL;
+static struct mbr_s *mbr = NULL;
 
 /*
   Fonction ne faissant rien. Utile pour initialiser les fonctions appelé lors
@@ -99,7 +105,7 @@ void mkhd(){
 	return;
 }
 
-/*************************  Commandes de bas niveau ***************************/
+/*************************  Commande de bas niveau  ***************************/
 void move_head(unsigned int cyl, unsigned int sec){
 	/* Saisie de l'addresse où doit se positionner la tête de lecture */
 	_out_16bits(cyl, HDA_DATAREGS);
@@ -161,4 +167,44 @@ void format_sector(unsigned int cylinder, unsigned int sector,
 		printf("Cyl = %d, sector = %d\n", cylinder, sector + i);
 		write_sector(cylinder, sector + i, buffer);
 	}
+	free(buffer);
+}
+
+/******************************* Gestion du MBR *******************************/
+void init_mbr_s(){
+	unsigned char *buffer;
+	int i;
+	int it_buf;
+	buffer = (unsigned char *)malloc(sizeof(unsigned char) * HDA_SECTORSIZE);
+	mbr = (struct mbr_s *)malloc(sizeof(struct mbr_s));
+	read_sector(0, 0, buffer);
+
+	/* Lecture du magic */
+	mbr->magic = (buffer[ST_MBR_MAGIC] << 16) + (buffer[ST_MBR_MAGIC+1]<<8);
+	mbr->magic += buffer[ST_MBR_MAGIC+2];
+
+	/* Lecture du nombre de volume créer */
+	mbr->nvol = buffer[ST_MBR_NVOL];
+
+	assert(mbr->nvol <= MAX_VOLUME);
+
+	/* Lecture des informations sur les volumes */
+	mbr->volume = (struct volume_s *)malloc(sizeof(struct volume_s)*MAX_VOLUME);
+	struct volume_s vol;
+	it_buf = ST_MBR_VOL;
+	for(i = 0; i < mbr->nvol; i++){
+		vol = mbr->volume[i];
+		vol->start_cyl = (buffer[it_buf] << 8) + buffer[it_buf+1];
+		vol->start_sec = (buffer[it_buf+2] << 8) + buffer[it_buf+3];
+		vol->nsector = (buffer[it_buf+4] << 8) + buffer[it_buf+5];
+		vol->type = buffer[it_buf+6];
+		it_buf += LN_MBR_VOL;
+	}
+	free(buffer);
+}
+
+struct mbr_s *get_mbr(){
+	if(!mbr)
+		init_mbr_s();
+	return mbr;
 }
