@@ -9,17 +9,24 @@ README.md     : le fichier README
 
 Pour compiler :
 ===============
-	Pour compiler l'ensemble du projet :
-		make all
 
-	Par nettoyer le projet :
+	Pour compiler le programme de création de disque :
+		make create-disk
+
+	Pour compiler le programme d'affichage de secteur du disque :
+		make dmps
+
+	Pour compiler le programme de test des fonctions de gestion du MBR :
+		make test_mbr
+
+	Par nettoyer le projet
 		make clean
 
 Structure du MBR
 ================
 Secteur 0 cylindre 0
 
-0           2           3           10          17          24          31          38          45          52         60
+0           2           3           8          12          17          22          27          32          37          42
 +-----------+-----------+-----------+-----------+-----------+-----------+-----------+-----------+-----------+-----------+
 |-----------|           |           |           |           |           |           |           |           |           |
 |   Magic   |  nb  vol  |   Vol 1   |   Vol 2   |   Vol 3   |   Vol 4   |   Vol 5   |   Vol 6   |   Vol 7   |   Vol 8   |
@@ -40,9 +47,9 @@ Pour vérifier que la MBR à bien été initialisé
 Description d'un volume :
 -------------------------
 
-0           2           3           4           5           6           7
-+------------+----------+-----------+-----------+-----------+-----------+
-| cylindre |            |                       |                       |           |
-|    de    |   secteur de début    |   nombre de secteurs  |    type   |
-|  début   |           |                       |                       |           |
-+-----------+-----------+-----------+-----------+-----------+-----------+-----------+
+0           1           2           3           4           5
++-----------+-----------+-----------+-----------+-----------+
+| cylindre  |  secteur  |                       |           |
+|    de     |    de     |   nombre de secteurs  |    type   |
+|   début   |   début   |                       |           |
++-----------+-----------+-----------+-----------+-----------+
