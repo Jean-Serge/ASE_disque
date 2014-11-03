@@ -21,4 +21,13 @@ extern void dmps(unsigned int, unsigned int);
  */ 
 extern void frmt();
 
+/**
+ * Ecrit la valeur 16 bit dans le registre indiqué (et le suivant)
+ */
+extern void ecrire_int(int*, int);
+
+/**
+ * Lit un mot de 16 bits au registre indiqué
+ */
+extern int lire_int(int*);
 #endif

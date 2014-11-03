@@ -12,6 +12,7 @@ int main(void)
   /* On initialise le matériel (pour avoir le .bin à lire) */
   init_hardware("hardware.ini");
   frmt();
+
   for(i = 0 ; i<16 ; i++)
     IRQVECTOR[i] = empty_it;
 
