@@ -54,30 +54,4 @@ extern void write_sector(unsigned int cylinder, unsigned int sector,
 extern void format_sector(unsigned int cylinder, unsigned int sector,
                           unsigned int nsector, unsigned int value);
 
-
-/******************************* Gestion du MBR *******************************/
-#define MAX_VOLUME 8
-#define MBR_MAGIC 0xB0B0
-
-enum vol_type{BASE, ANNEXE, OTHER};
-
-struct volume_s{
-	int start_cyl;
-	int start_sec;
-	int nsector;
-	enum vol_type type;
-};
-
-struct mbr_s{
-	int magic;
-	unsigned int nvol;
-	struct volume_s *volume;
-};
-
-extern struct mbr_s *get_mbr();
-
-extern void init_mbr_s();
-
-extern void save_mbr();
-
 #endif

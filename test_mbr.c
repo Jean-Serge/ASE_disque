@@ -1,5 +1,6 @@
 #include <stdlib.h>
 #include <stdio.h>
+#include "volume.h"
 #include "drive.h"
 
 void print_mbr(struct mbr_s *mbr){

@@ -35,8 +35,11 @@ frmt: drive frmt.c
 drive: drive.c drive.h
 	$(CC) $(CFLAGS) -o drive.o -c drive.c ${INCDIR}
 
-test_mbr: drive test_mbr.c
-	$(CC) $(CFLAGS) -o test_mbr.bin drive.o test_mbr.c ${LIBS}
+volume: volume.c volume.h
+	$(CC) $(CFLAGS) -o volume.o -c volume.c ${INCDIR}
+
+test_mbr: drive volume test_mbr.c
+	$(CC) $(CFLAGS) -o test_mbr.bin drive.o volume.o test_mbr.c ${LIBS}
 
 
 ###------------------------------
