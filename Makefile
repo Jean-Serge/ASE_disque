@@ -7,16 +7,16 @@ CFLAGS  += -g
 LIBDIR  = $(ROOTDIR)/lib
 INCDIR  = -I$(ROOTDIR)/include
 LIBS    = -L$(LIBDIR) -lhardware
+RM 	= rm -rf
 
 ###------------------------------
 ### Main targets 
 ###------------------------------------------------------------
-BINARIES= main 
+BINARIES= clean main  
 OBJECTS	= $(addsuffix .o,\
 	  main)
 
 all: $(BINARIES) $(OBJECTS)
-
 
 ###------------------------------
 ### Main rules 
@@ -29,11 +29,7 @@ disque.o : disque.c
 main: main.o disque.o 
 	$(CC) $(CFLAGS) -o main main.o disque.o $(LIBS)
 
-###------------------------------
-### Misc.
-###------------------------------------------------------------
-.PHONY: clean realclean depend
+
+.PHONY: clean
 clean:
-	$(RM) *.o $(BINARIES) *~ *#
-realclean: clean 
-	$(RM) vdiskA.bin vdiskB.bin
+	$(RM) *.o $(BINARIES) *~ *# vdisk*

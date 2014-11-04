@@ -8,6 +8,7 @@
 
 #define HDA_IRQ 14
 
+
 /**************************************************************************/
 
 
@@ -30,4 +31,19 @@ extern void ecrire_int(int*, int);
  * Lit un mot de 16 bits au registre indiqué
  */
 extern int lire_int(int*);
+
+/**
+ * Lit le contenu du couple cylindre/vecteur indiqués 
+ * et le stocke dans le buffer.
+ */
+extern void read_sector(unsigned int, unsigned int, unsigned char*);
+
+/**
+ * Ecrit le contenu du buffer à l'emplacement indiqué
+ */ 
+extern void write_sector(unsigned int, unsigned int, unsigned char*);
+extern void format_sector(unsigned int, unsigned int, unsigned int, unsigned int);
+
+
+extern void seek(unsigned int, unsigned int);
 #endif
