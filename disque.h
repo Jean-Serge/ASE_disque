@@ -25,12 +25,12 @@ extern void frmt();
 /**
  * Ecrit la valeur 16 bit dans le registre indiqué (et le suivant)
  */
-extern void ecrire_int(int*, int);
+extern void ecrire_int16(int*, int);
 
 /**
  * Lit un mot de 16 bits au registre indiqué
  */
-extern int lire_int(int*);
+extern int lire_int16(int*);
 
 /**
  * Lit le contenu du couple cylindre/vecteur indiqués 
@@ -41,7 +41,7 @@ extern void read_sector(unsigned int, unsigned int, unsigned char*);
 /**
  * Ecrit le contenu du buffer à l'emplacement indiqué
  */ 
-extern void write_sector(unsigned int, unsigned int, unsigned char*);
+extern void write_sector(unsigned int, unsigned int, const unsigned char*);
 extern void format_sector(unsigned int, unsigned int, unsigned int, unsigned int);
 
 

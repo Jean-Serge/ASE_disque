@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 #include "disque.h"
 #include "hardware.h"
@@ -9,16 +10,16 @@ int taille_secteur;
 void read_sector(unsigned int cylindre, unsigned int secteur, unsigned char* buffer)
 {
   int i, reg;
-  printf("%d\n", taille_secteur);
+
   /* On place la tête de lecture */
   seek(cylindre, secteur);
 
   /* On lit le disque */
   reg = HDA_DATAREGS;
-  ecrire_int(&reg, 1);
+  ecrire_int16(&reg, 1);
 
-  /* _out(HDA_CMDREG, CMD_READ); */
-  /* _sleep(HDA_IRQ); */
+  _out(HDA_CMDREG, CMD_READ);
+  _sleep(HDA_IRQ);
 
   /* On affiche le secteur lu */
   for(i = 0 ; i < taille_secteur ; i++)
@@ -30,16 +31,31 @@ void read_sector(unsigned int cylindre, unsigned int secteur, unsigned char* buf
     }
 }
 
-void write_sector(unsigned int cylindre, unsigned int secteur, unsigned char* buffer)
+void write_sector(unsigned int cylindre, unsigned int secteur, const unsigned char* buffer)
 {
-  
+  int i, reg = HDA_DATAREGS;
+  reg = HDA_CMDREG;
+  seek(cylindre, secteur);
+  ecrire_int16(&reg, 1);
+
+  for(i = 0 ; i < taille_secteur ; i++)
+    {
+      reg = HDA_CMDREG;
+      MASTERBUFFER[i] = buffer[i];
+      /* printf("%d\t%c\n", i, buffer[i]); */
+      /* _out(reg++, buffer[i]); */
+      /* _out(reg++, CMD_WRITE); */
+      /* _sleep(HDA_IRQ); */
+    }
+      _out(reg++, CMD_WRITE);
+      _sleep(HDA_IRQ);
 }
 
 void seek(unsigned int cylindre, unsigned int secteur)
 {
   int reg = HDA_DATAREGS;
-  ecrire_int(&reg, cylindre);
-  ecrire_int(&reg, secteur);
+  ecrire_int16(&reg, cylindre);
+  ecrire_int16(&reg, secteur);
   
   _out(HDA_CMDREG, CMD_SEEK);
   _sleep(HDA_IRQ);
@@ -68,29 +84,26 @@ void frmt()
   int reg = HDA_DATAREGS;
   
   _out(HDA_CMDREG, CMD_DSKINFO);
-  /* _sleep(HDA_IRQ); */
   
   /* On récupère le nombre de cylindres 
      et de secteurs du disque */
   reg = HDA_DATAREGS;
-  nbCyl = lire_int(&reg);
-  nbSec = lire_int(&reg);
+  nbCyl = lire_int16(&reg);
+  nbSec = lire_int16(&reg);
+
   /* On formate les secteurs un par un */
   for(i = 0 ; i < nbCyl ; i++)
     {
       for(j = 0 ; j < nbSec ; j++)
 	{
 	  /* On place la tête de lecture */
-	  reg = HDA_DATAREGS;
-	  ecrire_int(&reg, i);
-	  ecrire_int(&reg, j);
-	  _out(HDA_CMDREG, CMD_SEEK);
+	  seek(i,j);
 
 	  /* On met le secteur à 0 */
 	  reg = HDA_DATAREGS;
-	  ecrire_int(&reg, 1);
-	  ecrire_int(&reg, 0);
-	  ecrire_int(&reg, 0);
+	  ecrire_int16(&reg, 1);
+	  ecrire_int16(&reg, 0);
+	  ecrire_int16(&reg, 0);
 	  _out(HDA_CMDREG, CMD_FORMAT);
 	  _sleep(HDA_IRQ);
 	}   
@@ -98,13 +111,23 @@ void frmt()
 
 }
 
-void ecrire_int(int *reg, int val)
+void afficher_registre()
+{
+  int i;
+  int reg = HDA_DATAREGS;
+  for(i = 0 ; i < 16 ; i++)
+    {
+      printf("Registre %d : %d\n", i, lire_int16(&reg));
+    }
+}
+
+void ecrire_int16(int *reg, int val)
 {
   _out((*reg)++, val >> 8);
   _out((*reg)++, val & 0xFF);  
 }
 
-int lire_int(int *reg)
+int lire_int16(int *reg)
 {
   int val;
   val = _in((*reg)++) << 8;
