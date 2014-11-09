@@ -7,7 +7,6 @@
 
 static struct mbr_s *mbr = NULL;
 
-
 /******************************* Gestion du MBR *******************************/
 void init_mbr_s(){
 	unsigned char *buffer;
@@ -27,7 +26,6 @@ void init_mbr_s(){
 	assert(mbr->nvol <= MAX_VOLUME);
 
 	/* Lecture des informations sur les volumes */
-	mbr->volume = (struct volume_s *)malloc(sizeof(struct volume_s)*MAX_VOLUME);
 	it_buf = ST_MBR_VOL;
 	for(i = 0; i < mbr->nvol; i++){
 		vol = mbr->volume+i;
@@ -66,10 +64,10 @@ void save_mbr(){
 
 	/* Enregistrement du MAGIC */
 	buffer[ST_MBR_MAGIC] = mbr->magic>>8;
-	buffer[ST_MBR_MAGIC] = (mbr->magic<<8)>>8;
+	buffer[ST_MBR_MAGIC+1] = ((mbr->magic<<8)>>8) & 0xFF;
 
 	/* Enregistrement du nombre de volume */
-	buffer[ST_MBR_MAGIC] = mbr->nvol;
+	buffer[ST_MBR_NVOL] = mbr->nvol;
 
 	/* Enrefistrement des volumes */
 	it_buf = ST_MBR_VOL;
@@ -92,6 +90,8 @@ void save_mbr(){
 		}
 		it_buf += LN_MBR_VOL;
 	}
+
+	write_sector(0, 0, buffer);
 
 	free(buffer);
 }

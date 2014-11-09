@@ -8,7 +8,6 @@
 #include "include/hardware.h"
 #include "include/hw_info.h"
 
-
 /******************************* Gestion du MBR *******************************/
 #define MAX_VOLUME 8
 #define MBR_MAGIC 0xB0B0
@@ -25,7 +24,7 @@ struct volume_s{
 struct mbr_s{
 	int magic;
 	unsigned int nvol;
-	struct volume_s *volume;
+	struct volume_s volume[MAX_VOLUME];
 };
 
 extern struct mbr_s *get_mbr();
