@@ -61,3 +61,10 @@ Description d'un volume :
 |    de     |    de     |   nombre de secteurs  |    type   |
 |   début   |   début   |                       |           |
 +-----------+-----------+-----------+-----------+-----------+
+
+TODO
++ Ajouter dans le programme de test la mise en place de valeur par défaut.
++ Création de la structure du superbloc et de la structures
+  de gestions des blocs libres.
++ Allouer un bloc
++ Liberer un bloc
