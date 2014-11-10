@@ -1,22 +1,23 @@
-
 ROOTDIR=/home/m1/monbailly/Documents/ASE/ASE_disque
 
 CC	= gcc
 CFLAGS	= -Wall -ansi -pedantic 
 CFLAGS  += -g
+
 LIBDIR  = $(ROOTDIR)/lib
 INCDIR  = -I$(ROOTDIR)/include
 LIBS    = -L$(LIBDIR) -lhardware
-RM 	= rm -rf
+#RM 	= rm -rf
 
 ###------------------------------
 ### Main targets 
 ###------------------------------------------------------------
 BINARIES= clean main  
-OBJECTS	= $(addsuffix .o,\
+#OBJECTS	= $(addsuffix .o,\
 	  main)
 
-all: $(BINARIES) $(OBJECTS)
+#all: $(BINARIES) $(OBJECTS)
+all: clean main
 
 ###------------------------------
 ### Main rules 
@@ -32,4 +33,4 @@ main: main.o disque.o
 
 .PHONY: clean
 clean:
-	$(RM) *.o $(BINARIES) *~ *# vdisk*
+	rm -rf *.o $(BINARIES) *~ *# vdisk*

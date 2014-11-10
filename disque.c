@@ -9,7 +9,7 @@ int taille_secteur;
 
 void read_sector(unsigned int cylindre, unsigned int secteur, unsigned char* buffer)
 {
-  int i, reg;
+  int reg;
 
   /* On place la tête de lecture */
   seek(cylindre, secteur);
@@ -21,19 +21,13 @@ void read_sector(unsigned int cylindre, unsigned int secteur, unsigned char* buf
   _out(HDA_CMDREG, CMD_READ);
   _sleep(HDA_IRQ);
 
-  /* On affiche le secteur lu */
-  for(i = 0 ; i < taille_secteur ; i++)
-    {
-
-    buffer[i] = MASTERBUFFER[i];
-    printf("%c", buffer[i]);
-
-    }
+  /* On place le contenu du secteur dans le buffer */
+  memcpy(buffer, MASTERBUFFER, taille_secteur);
 }
 
 void write_sector(unsigned int cylindre, unsigned int secteur, const unsigned char* buffer)
 {
-  int i, reg = HDA_DATAREGS;
+  int i, reg;
   reg = HDA_CMDREG;
   seek(cylindre, secteur);
   ecrire_int16(&reg, 1);
@@ -47,8 +41,8 @@ void write_sector(unsigned int cylindre, unsigned int secteur, const unsigned ch
       /* _out(reg++, CMD_WRITE); */
       /* _sleep(HDA_IRQ); */
     }
-      _out(reg++, CMD_WRITE);
-      _sleep(HDA_IRQ);
+  _out(reg++, CMD_WRITE);
+  _sleep(HDA_IRQ);
 }
 
 void seek(unsigned int cylindre, unsigned int secteur)
