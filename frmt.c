@@ -1,5 +1,6 @@
 #include "include/hardware.h"
 #include "drive.h"
+#include "volume.h"
 
 void frmt(){
 	int i;
@@ -13,8 +14,17 @@ void frmt(){
 	}
 }
 
+void write_mbr(){
+	struct mbr_s *mbr;
+	mbr = get_mbr();
+	mbr->magic = 0xB0B0;
+	mbr->nvol = 0;
+	save_mbr();
+}
+
 int main(){
 	mkhd();
 	frmt();
+	write_mbr();
 	return 0;
 }
