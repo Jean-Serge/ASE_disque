@@ -29,8 +29,8 @@ create-disk: drive create_disk.c
 dmps: drive dmps.c
 	$(CC) $(CFLAGS) -o dmps.bin drive.o dmps.c ${LIBS}
 
-frmt: drive frmt.c
-	$(CC) $(CFLAGS) -o frmt.bin drive.o frmt.c ${LIBS}
+frmt: drive volume.o frmt.c
+	$(CC) $(CFLAGS) -o frmt.bin drive.o volume.o frmt.c ${LIBS}
 
 drive: drive.c drive.h
 	$(CC) $(CFLAGS) -o drive.o -c drive.c ${INCDIR}
