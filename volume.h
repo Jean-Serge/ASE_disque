@@ -33,4 +33,16 @@ extern void init_mbr_s();
 
 extern void save_mbr();
 
+/***********************  Fonction d'IO sur des blocs *************************/
+extern int convert_bloc(unsigned int nvol, unsigned int bloc,
+                        unsigned int *cyl, unsigned int *sec);
+
+extern void read_bloc(unsigned int vol, unsigned int nbloc,
+                      unsigned char *buffer);
+
+extern void write_bloc(unsigned int vol, unsigned int nbloc,
+                       const unsigned char *buffer);
+
+extern void format_vol(unsigned int nvol);
+
 #endif

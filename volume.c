@@ -76,7 +76,7 @@ void save_mbr(){
 		buffer[it_buf] = vol->start_cyl;
 		buffer[it_buf+1] = vol->start_sec;
 		buffer[it_buf+2] = vol->nsector>>8;
-		buffer[it_buf+3] = (vol->nsector<<8)>>8;
+		buffer[it_buf+3] = (vol->nsector>>8)& 0xF;
 		if(vol->type == BASE){
 			buffer[it_buf+4] = 0;
 		}
@@ -94,4 +94,52 @@ void save_mbr(){
 	write_sector(0, 0, buffer);
 
 	free(buffer);
+}
+
+/***********************  Fonction d'IO sur des blocs *************************/
+/*
+  Retourne -1 si erreur.
+*/
+int convert_bloc(unsigned int nvol, unsigned int bloc, unsigned int *cyl,
+                 unsigned int *sec){
+	/* Vérification de surface des paramêtre */
+	struct volume_s vol;
+	if(nvol >= MAX_VOLUME || nvol < 0 || bloc < 0 || nvol > mbr->nvol){
+		return -1;
+	}
+	vol = mbr->volume[nvol];
+	*cyl = (vol.start_cyl + (vol.start_sec + bloc) + HDA_MAXSECTOR);
+	*sec = (vol.start_sec + bloc) % HDA_MAXSECTOR;
+	return 0;
+}
+
+void read_bloc(unsigned int vol, unsigned int nbloc,
+               unsigned char *buffer){
+	unsigned int sec, cyl;
+	assert(convert_bloc(vol, nbloc, &cyl, &sec) > 0);
+	read_sector(cyl, sec, buffer);
+	return;
+}
+
+void write_bloc(unsigned int vol, unsigned int nbloc,
+                const unsigned char *buffer){
+	unsigned int sec, cyl;
+	assert(convert_bloc(vol, nbloc, &cyl, &sec) > 0);
+	write_sector(cyl, sec, buffer);
+	return;
+}
+
+void format_vol(unsigned int nvol){
+	struct volume_s vol;
+	int i;
+	unsigned char *buffer;
+	if(nvol > mbr->nvol){
+		return;
+	}
+	buffer = (unsigned char *)calloc(HDA_SECTORSIZE, sizeof(unsigned char));
+	vol = mbr->volume[nvol];
+	for(i = 0; i < vol.nsector; i++){
+		write_bloc(nvol, i, buffer);
+	}
+	return;
 }
