@@ -11,10 +11,8 @@ void usage(){
 	exit(SUCCESS);
 }
 
-void print_info(int nvol){
-	struct mbr_s *mbr;
+void print_info(int nvol,struct mbr_s *mbr){
 	struct volume_s vol;
-	mbr = get_mbr();
 	vol = mbr->volume[nvol];
 	printf("Affichage des informations du volume %d :\n", nvol);
 	printf("\tCylindre de départ : %d\n", vol.start_cyl);
@@ -37,19 +35,26 @@ void print_info(int nvol){
 
 int main(int argc, char **argv){
 	int nvol;
+	struct mbr_s *mbr;
 
 	if(argc != 2){
 		usage();
 	}
 	mkhd();
 	nvol = atoi(argv[1]);
+	mbr = get_mbr();
 
 	/* vérification de surface */
 	if(nvol < 0 || nvol > MAX_VOLUME){
 		usage();
 	}
 
-	print_info(nvol);
-
+	if(nvol < mbr->nvol){
+		print_info(nvol, mbr);
+	}
+	else{
+		printf("Le numéro de volume correspond à un volume non initialisé.\n");
+		return 1;
+	}
 	return 0;
 }
