@@ -23,8 +23,6 @@ void init_mbr_s(){
 	/* Lecture du nombre de volume créer */
 	mbr->nvol = buffer[ST_MBR_NVOL];
 
-	assert(mbr->nvol <= MAX_VOLUME);
-
 	/* Lecture des informations sur les volumes */
 	it_buf = ST_MBR_VOL;
 	for(i = 0; i < mbr->nvol; i++){
