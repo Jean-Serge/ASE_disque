@@ -39,7 +39,7 @@ int main(){
 	printf("\n*** Modification du MBR ***\n");
 	mbr->magic = 0xAAAA;
 	mbr->nvol = 2;
-	vol = (struct volume_s *)malloc(sizeof(struct volume_s));
+	vol = (struct volume_s *)calloc(1, sizeof(struct volume_s));
 	vol->start_cyl = 10;
 	vol->start_cyl = 10;
 	vol->nsector = 1;
