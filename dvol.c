@@ -43,10 +43,13 @@ int main(int argc, char **argv){
 	}
 	mkhd();
 	nvol = atoi(argv[1]);
+
 	/* vérification de surface */
 	if(nvol < 0 || nvol > MAX_VOLUME){
 		usage();
 	}
+
 	print_info(nvol);
+
 	return 0;
 }
