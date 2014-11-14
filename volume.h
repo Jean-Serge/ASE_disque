@@ -8,6 +8,39 @@
 #include "include/hardware.h"
 #include "include/hw_info.h"
 
+
+/**************************  Gestion des superblocs ***************************/
+#define SUPER_MAGIC 0xD0D0
+
+struct superbloc_s{
+	int magic;
+	int serial;
+	int inoeud;
+	int nb_free_node;
+	int free_node;
+	char *nom;
+};
+
+struct free_bloc_s{
+  int nb_free_blocs;
+  int next;
+};
+
+extern void init_super(unsigned int vol);
+
+
+extern int load_super(unsigned int vol);
+
+
+extern void save_super();
+
+
+extern unsigned int new_bloc();
+
+
+extern void free_bloc(unsigned int bloc);
+
+
 /******************************* Gestion du MBR *******************************/
 #define MAX_VOLUME 8
 #define MBR_MAGIC 0xB0B0
@@ -44,5 +77,6 @@ extern void write_bloc(unsigned int vol, unsigned int nbloc,
                        const unsigned char *buffer);
 
 extern void format_vol(unsigned int nvol);
+
 
 #endif
