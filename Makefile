@@ -44,7 +44,7 @@ test_mbr: drive volume test_mbr.c
 dvol: volume drive dvol.c
 	$(CC) $(CFLAGS) -o dvol.bin drive.o volume.o dvol.c ${LIBS}
 
-mkvol: volume mkvol.c
+mkvol: volume drive mkvol.c
 	$(CC) $(CFLAGS) -o mkvol.bin drive.o volume.o mkvol.c ${LIBS}
 
 init_mbr: volume drive init_mbr.c
