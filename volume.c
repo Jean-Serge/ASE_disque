@@ -6,7 +6,7 @@
 #define ST_MBR_VOL     3
 #define LN_MBR_VOL     5
 
-static struct mbr_s *mbr = NULL;
+struct mbr_s *mbr = NULL;
 static int vol_courant;
 static struct superbloc_s *super_courant = NULL;
 
