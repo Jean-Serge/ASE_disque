@@ -8,7 +8,6 @@
 #include "include/hardware.h"
 #include "include/hw_info.h"
 
-
 /**************************  Gestion des superblocs ***************************/
 #define SUPER_MAGIC 0xD0D0
 
@@ -22,21 +21,17 @@ struct superbloc_s{
 };
 
 struct free_bloc_s{
-  int nb_free_blocs;
-  int next;
+	int nb_free_blocs;
+	int next;
 };
 
 extern void init_super(unsigned int vol);
 
-
 extern int load_super(unsigned int vol);
-
 
 extern void save_super();
 
-
 extern unsigned int new_bloc();
-
 
 extern void free_bloc(unsigned int bloc);
 
@@ -66,6 +61,7 @@ extern void init_mbr_s();
 
 extern void save_mbr();
 
+
 /***********************  Fonction d'IO sur des blocs *************************/
 extern int convert_bloc(unsigned int nvol, unsigned int bloc,
                         unsigned int *cyl, unsigned int *sec);
@@ -77,6 +73,5 @@ extern void write_bloc(unsigned int vol, unsigned int nbloc,
                        const unsigned char *buffer);
 
 extern void format_vol(unsigned int nvol);
-
 
 #endif
