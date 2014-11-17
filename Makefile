@@ -18,7 +18,7 @@ OBJECTS	= $(addsuffix .o,\
 	  mkhd)
 
 #all: $(BINARIES) $(OBJECTS)
-all: create-disk dmps frmt drive volume test_mbr dvol init_mbr mkvol
+all: create-disk dmps frmt drive volume test_mbr dvol print_mbr mkvol
 
 ###------------------------------
 ### Main rules
@@ -47,8 +47,8 @@ dvol: volume drive dvol.c
 mkvol: volume drive mkvol.c
 	$(CC) $(CFLAGS) -o mkvol.bin drive.o volume.o mkvol.c ${LIBS}
 
-init_mbr: volume drive init_mbr.c
-	$(CC) $(CFLAGS) -o init_mbr.bin drive.o volume.o init_mbr.c ${LIBS}
+print_mbr: volume drive print_mbr.c
+	$(CC) $(CFLAGS) -o print_mbr.bin drive.o volume.o print_mbr.c ${LIBS}
 
 
 ###------------------------------
