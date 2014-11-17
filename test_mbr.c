@@ -35,22 +35,5 @@ int main(){
 	mbr = get_mbr();
 	printf("\n*** MBR lu ***\n\n");
 	print_mbr(mbr);
-
-	printf("\n*** Modification du MBR ***\n");
-	mbr->magic = 0xAAAA;
-	mbr->nvol = 2;
-	vol = (struct volume_s *)calloc(1, sizeof(struct volume_s));
-	vol->start_cyl = 10;
-	vol->start_cyl = 10;
-	vol->nsector = 1;
-	vol->type = OTHER;
-	mbr->volume[1] = *vol;
-
-	printf("*** Écriture du MBR modifié sur le disque ***\n");
-	save_mbr();
-	printf("*** MBR modifié lu sur le disque ***\n\n");
-	init_mbr_s();
-	print_mbr(mbr);
-
 	return 0;
 }
