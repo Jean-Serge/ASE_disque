@@ -1,5 +1,5 @@
-#ifndef _H_MKVOL_
-#define _H_VOLUME
+#ifndef _H_MKVOL
+#define _H_MKVOL
 
 #include <unistd.h>
 #include <getopt.h>

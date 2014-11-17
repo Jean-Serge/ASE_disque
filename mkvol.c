@@ -3,7 +3,7 @@
 /* note :  */
 /* décaller les volumes vers la droite si ajout d'un volume entre deux autres. */
 
-struct mbr_s *mbr = NULL;
+static struct mbr_s *mbr = NULL;
 
 void usage(){
 	printf("Création d'un disque.\n");
@@ -12,15 +12,16 @@ void usage(){
 
 void init_boundary(struct vol_boundary_s *boundary, unsigned int nb_vol){
 	int i = 0;
-	int cyl;
-	int sec;
+	unsigned int cyl;
+	unsigned int sec;
 	struct volume_s *volumes;
 	boundary = (struct vol_boundary_s *)malloc(sizeof(struct vol_boundary_s) *
 	            nb_vol);
+	volumes = mbr->volume;
 	for(; i < nb_vol; i++){
-		(boundary+i)->first_cyl = volumes[i]->start_cyl;
-		boundary[i].first_sec = volumes[i]->start_sec;
-		convert_bloc(i, volumes[i]->nsector, &cyl, &sec);
+		boundary[i].first_cyl = volumes[i].start_cyl;
+		boundary[i].first_sec = volumes[i].start_sec;
+		convert_bloc(i, volumes[i].nsector, &cyl, &sec);
 		boundary[i].last_cyl = cyl;
 		boundary[i].last_sec = sec;
 	}
@@ -28,7 +29,7 @@ void init_boundary(struct vol_boundary_s *boundary, unsigned int nb_vol){
 
 
 void chck_possible(unsigned int fc, unsigned int fs, unsigned int size){
-	struct vol_boundary_s *boundary;
+	struct vol_boundary_s *boundary = NULL;
 	if(!mbr)
 		mbr = get_mbr();
 	init_boundary(boundary, mbr->nvol);
@@ -98,7 +99,7 @@ int main(int argc, char **argv){
 	chck_present_flag(fc_flag, fs_flag, sz_flag);
 	mbr = get_mbr();
 
-	check_possible(fc, fs, size);
+	chck_possible(fc, fs, size);
 
 	return SUCCESS;
 }
