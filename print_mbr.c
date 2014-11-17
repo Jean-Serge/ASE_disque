@@ -30,7 +30,6 @@ void print_mbr(struct mbr_s *mbr){
 
 int main(){
 	struct mbr_s *mbr;
-	struct volume_s *vol;
 	mkhd();
 	mbr = get_mbr();
 	printf("\n*** MBR lu ***\n\n");
