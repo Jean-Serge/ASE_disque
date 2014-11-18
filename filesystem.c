@@ -85,3 +85,34 @@ void free_bloc(unsigned int bloc){
 	super_courant->free_node = bloc;
 	write_sector(vol_courant, bloc, (const unsigned char*) &free);
 }
+
+
+/**************************** Gestion des inodes ******************************/
+
+void read_inode(unsigned int inumber, struct inode_s* inode)
+{
+  read_bloc(vol_courant, inumber, (unsigned char*)inode);
+}
+
+void write_inode(unsigned int inumber, struct inode_s* inode)
+{
+  write_bloc(vol_courant, inumber, (unsigned char*)inode);
+}
+
+unsigned int create_inode(enum file_type_e type)
+{
+  /* Initialisation de l'inode */
+  struct inode_s inode;
+  int inumber;
+
+  inode.taille = 0;
+  inode.type = type;
+  inode.bloc_direct = (int *) calloc(NB_BLOCS, 1);
+  inode.bloc_indirect = (int *) calloc(NB_BLOCS, 1);
+  inode.bloc_double = (int *) calloc(NB_BLOCS, 1);
+
+  inumber = new_bloc();
+  write_inode(inumber, &inode);
+  return inumber;
+}
+
