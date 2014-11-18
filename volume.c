@@ -90,10 +90,6 @@ void save_mbr(){
 		it_buf += LN_MBR_VOL;
 	}
 
-	for(i = 0; i < HDA_SECTORSIZE; i++){
-		printf("%x ", buffer[i]);
-	}
-
 	write_sector(0, 0, buffer);
 
 	free(buffer);
