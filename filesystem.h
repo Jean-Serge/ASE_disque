@@ -59,9 +59,9 @@ typedef enum {
 struct inode_s{
   enum file_type_e type;
   int taille;
-  int bloc_direct[NB_BLOCS];
-  int bloc_indirect[NB_BLOCS];
-  int bloc_double[NB_BLOCS];
+  int *bloc_direct;
+  int bloc_indirect;
+  int bloc_double;
 };
 extern void read_inode(unsigned int inumber, struct inode_s* inode);
 
