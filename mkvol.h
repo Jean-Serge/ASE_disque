@@ -8,10 +8,11 @@
 #include <stdio.h>
 #include "volume.h"
 
-#define SUCCESS  0
-#define ERR_COOR 1
-#define ERR_ARGT 2
-#define ERR_NEG  3
+#define SUCCESS     0
+#define ERR_COOR    1
+#define ERR_ARGT    2
+#define ERR_NEG     3
+#define ERR_MX_VOL  4
 
 struct vol_boundary_s{
 	unsigned int first_cyl;

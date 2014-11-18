@@ -1,8 +1,5 @@
 #include "mkvol.h"
 
-/* note :  */
-/* décaller les volumes vers la droite si ajout d'un volume entre deux autres. */
-
 static struct mbr_s *mbr = NULL;
 
 void usage(){
@@ -28,14 +25,22 @@ void init_boundary(struct vol_boundary_s *boundary, unsigned int nb_vol){
 }
 
 
-void chck_possible(unsigned int fc, unsigned int fs, unsigned int size){
+int chck_possible(unsigned int fc, unsigned int fs, unsigned int size){
 	struct vol_boundary_s *boundary = NULL;
+	int i = 0;
 	if(!mbr)
 		mbr = get_mbr();
 	init_boundary(boundary, mbr->nvol);
+	for(; i < mbr->nvol; i++){
+		if((fc >= boundary[i].first_cyl) && (fs >= boundary[i].first_sec)
+		    && (fc <= boundary[i].last_cyl) && (fs <= boundary[i].last_sec)){
+			return 0;
+		}
+	}
+	return 1;
 }
 
-void chck_present_flag(unsigned int fc, unsigned int fs, unsigned int sz){
+int chck_present_flag(unsigned int fc, unsigned int fs, unsigned int sz){
 	int all = 1;
 	if(fc == 0){
 		printf("Missing argument : fc not found.\n");
@@ -49,8 +54,18 @@ void chck_present_flag(unsigned int fc, unsigned int fs, unsigned int sz){
 		printf("Missing argument : s not found.\n");
 		all = 0;
 	}
-	if(!all) /* Missing flag -> exit*/
-		exit(ERR_ARGT);
+	return all;
+}
+
+void create_volume(int fc, int fs, int size){
+	struct volume_s vol; /* = (struct volume_s *)malloc(sizeof(struct volume_s)); */
+	vol.start_cyl = fc;
+	vol.start_sec = fs;
+	vol.nsector = size;
+	vol.type = BASE;
+	mbr->volume[mbr->nvol] = vol;
+	save_mbr();
+	printf("Volume créé.\n");
 }
 
 int main(int argc, char **argv){
@@ -96,10 +111,22 @@ int main(int argc, char **argv){
 		}
 	}
 
-	chck_present_flag(fc_flag, fs_flag, sz_flag);
-	mbr = get_mbr();
+	mkhd();
 
-	chck_possible(fc, fs, size);
+	if(!chck_present_flag(fc_flag, fs_flag, sz_flag)){
+		fprintf(stderr, "Tous les arguments ne sont pas présent.\n");
+		exit(ERR_ARGT);
+	}
+	mbr = get_mbr();
+	if(MAX_VOLUME == mbr->nvol){
+		fprintf(stderr, "%d volume, vous ne pouvez pas en créer d'autre.\n", MAX_VOLUME);
+		exit(ERR_MX_VOL);
+	}
+	if(mbr->nvol > 0 && !chck_possible(fc, fs, size)){
+		exit(ERR_COOR);
+	}
+
+	create_volume(fc, fs, size);
 
 	return SUCCESS;
 }
