@@ -85,3 +85,78 @@ void free_bloc(unsigned int bloc){
 	super_courant->free_node = bloc;
 	write_sector(vol_courant, bloc, (const unsigned char*) &free);
 }
+
+
+/**************************** Gestion des inodes ******************************/
+
+void read_inode(unsigned int inumber, struct inode_s* inode)
+{
+  read_bloc(vol_courant, inumber, (unsigned char*)inode);
+}
+
+void write_inode(unsigned int inumber, struct inode_s* inode)
+{
+  write_bloc(vol_courant, inumber, (unsigned char*)inode);
+}
+
+unsigned int create_inode(enum file_type_e type)
+{
+  /* Initialisation de l'inode */
+  struct inode_s inode;
+  int inumber;
+
+  inode.taille = 0;
+  inode.type = type;
+  inode.bloc_direct = (int *) calloc(NB_BLOCS, 1);
+  inode.bloc_indirect = 0;
+  inode.bloc_double = 0;
+
+  inumber = new_bloc();
+  write_inode(inumber, &inode);
+  return inumber;
+}
+
+int delete_inode(unsigned inumber)
+{
+  int i, j;
+  struct inode_s *inode;
+  unsigned char* buffer_direct = (unsigned char *)malloc(HDA_SECTORSIZE);
+  unsigned char* buffer_indirect = (unsigned char *)malloc(HDA_SECTORSIZE);
+  unsigned char* tmp = (unsigned char *)malloc(HDA_SECTORSIZE);
+  
+  inode = (struct inode_s*) buffer_direct;
+
+  /* Suppression des blocs en référencement direct */
+  for(i = 0 ; i < NB_BLOCS ; i++)
+    {
+      if(inode->bloc_direct[i] == 0)
+	return 0; 
+      free_bloc(inode->bloc_direct[i]);
+    }
+
+  /* Suppression des blocs en référencement indirect */
+  read_bloc(vol_courant, inode->bloc_indirect, buffer_direct);
+  for(i = 0 ; i < NB_BLOCS ; i++)
+    {
+      if(buffer_indirect[i] == 0)
+	return 0;
+      free_bloc(buffer_direct[i]);
+    }
+
+  /* Suppression des blocs en double référencement indirect */
+  read_bloc(vol_courant, inode->bloc_double, buffer_indirect);
+  for(i = 0 ; i < NB_BLOCS ; i++)
+    {      
+      read_bloc(vol_courant, buffer_indirect[i], tmp);
+      for(j = 0 ; j < NB_BLOCS ; j++)
+	{
+	  if(tmp[i] == 0)
+	    return 0;
+	  free_bloc(tmp[i]);
+	}
+    }
+  
+  /* Suppression de l'inode */
+  free_bloc(inumber);
+  return 0;
+}
