@@ -6,7 +6,6 @@
 #define LN_MBR_VOL     5
 
 static struct mbr_s *mbr = NULL;
-
 /******************************* Gestion du MBR *******************************/
 
 void init_mbr_s(){
