@@ -142,3 +142,37 @@ void format_vol(unsigned int nvol){
 	}
 	return;
 }
+
+/*
+  Converti une coordonnée en cylindre et secteur en un bloc pour un volume nvol
+  donnée.
+  Retourne le numéro du bloc correspond. -1 Si le bloc ne fait pas parti du
+  volume nvol ou que les coordonnée cyl et sec sont inférieur à 0.
+ */
+int convert_cyl_sec(unsigned int nvol, unsigned int cyl,
+                    unsigned int sec){
+	int blc = 0;
+	struct volume_s vol;
+	if(cyl < 0 || sec < 0)
+		return -1;
+	if(!mbr)
+		init_mbr_s();
+	vol = mbr->volume[nvol];
+
+	if(vol.start_cyl == cyl){
+		blc += sec - vol.start_sec;
+	}
+	else{
+		int i;
+		blc += (HDA_MAXSECTOR - vol.start_sec);
+		if(cyl - vol.start_cyl < 0)
+			return -1;
+		for(i = 0; i < cyl - vol.start_cyl; i++){
+			blc += HDA_MAXSECTOR;
+		}
+		blc += sec;
+	}
+	if (blc <= vol.nsector)
+		return blc;
+	return -1;
+}

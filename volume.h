@@ -47,4 +47,7 @@ extern void write_bloc(unsigned int vol, unsigned int nbloc,
 
 extern void format_vol(unsigned int nvol);
 
+extern int convert_cyl_sec(unsigned int nvol, unsigned int cyl,
+                           unsigned int sec);
+
 #endif
