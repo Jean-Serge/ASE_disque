@@ -74,7 +74,7 @@ void save_mbr(){
 		buffer[it_buf] = vol->start_cyl;
 		buffer[it_buf+1] = vol->start_sec;
 		buffer[it_buf+2] = vol->nsector>>8;
-		buffer[it_buf+3] = (vol->nsector>>8)& 0xF;
+		buffer[it_buf+3] = (vol->nsector) & 0xF;
 		if(vol->type == BASE){
 			buffer[it_buf+4] = 0;
 		}

@@ -18,7 +18,7 @@ OBJECTS	= $(addsuffix .o,\
 	  mkhd)
 
 #all: $(BINARIES) $(OBJECTS)
-all: create-disk dmps frmt drive volume filesystem test_mbr dvol print_mbr mkvol
+all: create-disk dmps frmt drive volume filesystem dvol print_mbr mkvol
 
 ###------------------------------
 ### Main rules

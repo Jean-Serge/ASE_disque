@@ -7,14 +7,17 @@ void usage(){
 	exit(SUCCESS);
 }
 
-void init_boundary(struct vol_boundary_s *boundary, unsigned int nb_vol){
+struct vol_boundary_s *init_boundary(unsigned int nb_vol){
 	int i = 0;
 	unsigned int cyl;
 	unsigned int sec;
 	struct volume_s *volumes;
+	struct vol_boundary_s *boundary;
+	printf("mbr->nvol = %d\n", mbr->nvol);
 	boundary = (struct vol_boundary_s *)malloc(sizeof(struct vol_boundary_s) *
 	            nb_vol);
 	volumes = mbr->volume;
+	printf("volume ptr = %p boundary %p\n", (void *)volumes, (void *)boundary);
 	for(; i < nb_vol; i++){
 		boundary[i].first_cyl = volumes[i].start_cyl;
 		boundary[i].first_sec = volumes[i].start_sec;
@@ -22,15 +25,20 @@ void init_boundary(struct vol_boundary_s *boundary, unsigned int nb_vol){
 		boundary[i].last_cyl = cyl;
 		boundary[i].last_sec = sec;
 	}
+	return boundary;
 }
 
 
 int chck_possible(unsigned int fc, unsigned int fs, unsigned int size){
-	struct vol_boundary_s *boundary = NULL;
+	struct vol_boundary_s *boundary;
 	int i = 0;
 	if(!mbr)
 		mbr = get_mbr();
-	init_boundary(boundary, mbr->nvol);
+
+	if(mbr->nvol == 0)
+		return 1;
+
+	boundary = init_boundary(mbr->nvol);
 	for(; i < mbr->nvol; i++){
 		if((fc >= boundary[i].first_cyl) && (fs >= boundary[i].first_sec)
 		    && (fc <= boundary[i].last_cyl) && (fs <= boundary[i].last_sec)){
@@ -43,29 +51,30 @@ int chck_possible(unsigned int fc, unsigned int fs, unsigned int size){
 int chck_present_flag(unsigned int fc, unsigned int fs, unsigned int sz){
 	int all = 1;
 	if(fc == 0){
-		printf("Missing argument : fc not found.\n");
-		all = 0;
+		printf("Missing argument : -fc not found.\n");
 	}
+		all = 0;
 	if(fs == 0){
-		printf("Missing argument : fs not found.\n");
+		printf("Missing argument : -fs not found.\n");
 		all = 0;
 	}
 	if(sz == 0){
-		printf("Missing argument : s not found.\n");
+		printf("Missing argument : -s not found.\n");
 		all = 0;
 	}
 	return all;
 }
 
 void create_volume(int fc, int fs, int size){
-	struct volume_s vol; /* = (struct volume_s *)malloc(sizeof(struct volume_s)); */
+	struct volume_s vol;
 	vol.start_cyl = fc;
 	vol.start_sec = fs;
 	vol.nsector = size;
 	vol.type = BASE;
 	mbr->volume[mbr->nvol] = vol;
+	mbr->nvol++;
 	save_mbr();
-	printf("Volume créé.\n");
+	printf("Volume créé de taille %d.\n", size);
 }
 
 int main(int argc, char **argv){
@@ -113,7 +122,7 @@ int main(int argc, char **argv){
 
 	mkhd();
 
-	if(!chck_present_flag(fc_flag, fs_flag, sz_flag)){
+	if(chck_present_flag(fc_flag, fs_flag, sz_flag)){
 		fprintf(stderr, "Tous les arguments ne sont pas présent.\n");
 		exit(ERR_ARGT);
 	}
@@ -122,7 +131,8 @@ int main(int argc, char **argv){
 		fprintf(stderr, "%d volume, vous ne pouvez pas en créer d'autre.\n", MAX_VOLUME);
 		exit(ERR_MX_VOL);
 	}
-	if(mbr->nvol > 0 && !chck_possible(fc, fs, size)){
+	if(!chck_possible(fc, fs, size)){
+		fprintf(stderr, "Vous ne pouvez pas placer un volume aux coordonnées passé en paramêtre.\n");
 		exit(ERR_COOR);
 	}
 

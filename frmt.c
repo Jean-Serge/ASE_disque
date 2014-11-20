@@ -17,7 +17,7 @@ void frmt(){
 void write_mbr(){
 	struct mbr_s *mbr;
 	mbr = get_mbr();
-	mbr->magic = 0xB0B0;
+	mbr->magic = MBR_MAGIC;
 	mbr->nvol = 0;
 	save_mbr();
 }
