@@ -156,6 +156,10 @@ int convert_cyl_sec(unsigned int nvol, unsigned int cyl,
 		return -1;
 	if(!mbr)
 		init_mbr_s();
+
+	if(mbr->nvol == 0)
+		return -1;
+
 	vol = mbr->volume[nvol];
 
 	if(vol.start_cyl == cyl){
