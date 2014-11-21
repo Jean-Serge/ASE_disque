@@ -32,7 +32,6 @@ int main(){
 	struct mbr_s *mbr;
 	mkhd();
 	mbr = get_mbr();
-	printf("\n*** MBR lu ***\n\n");
 	print_mbr(mbr);
 	return 0;
 }
