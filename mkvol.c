@@ -4,6 +4,11 @@ static struct mbr_s *mbr = NULL;
 
 void usage(){
 	printf("Création d'un disque.\n");
+	printf("Liste des options :\n");
+	printf("\t-fc first cylinder : cylindre de départ de la partition.\n");
+	printf("\t-fs first sector   : secteur de départ de la parition.\n");
+	printf("\t-s size            : taille de la partition à créer.\n");
+	printf("\t-h help            : affiche cette aide.\n");
 	exit(SUCCESS);
 }
 
@@ -16,12 +21,11 @@ int chck_possible(unsigned int fc, unsigned int fs, unsigned int size){
 	if(!mbr)
 		mbr = get_mbr();
 
-	lc = size / HDA_MAXSECTOR;
+	lc = fc + size / HDA_MAXSECTOR;
 	rest = size % HDA_MAXSECTOR;
 	ls = rest - (rest - fs) - 1;
 
 	for(; i < mbr->nvol; i++){
-		printf("start = %d, end = %d", convert_cyl_sec(i, fc, fs), convert_cyl_sec(i, lc, ls));
 		if((convert_cyl_sec(i, fc, fs) != -1) ||
 		   (convert_cyl_sec(i, lc, ls) != -1)){
 			return 0;
