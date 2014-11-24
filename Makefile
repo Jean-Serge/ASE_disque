@@ -50,6 +50,9 @@ mkvol: volume drive mkvol.c
 print_mbr: volume drive print_mbr.c
 	$(CC) $(CFLAGS) -o print_mbr.bin drive.o volume.o print_mbr.c ${LIBS}
 
+test_convert_blc: volume drive test/test_convert_blc.c
+	$(CC) $(CFLAGS) -o test_convert_blc.bin drive.o volume.o test/test_convert_blc.c ${LIBS}
+
 
 ###------------------------------
 ### Misc.
