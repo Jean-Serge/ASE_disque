@@ -7,41 +7,23 @@ void usage(){
 	exit(SUCCESS);
 }
 
-struct vol_boundary_s *init_boundary(unsigned int nb_vol){
-	int i = 0;
-	unsigned int cyl;
-	unsigned int sec;
-	struct volume_s *volumes;
-	struct vol_boundary_s *boundary;
-	printf("mbr->nvol = %d\n", mbr->nvol);
-	boundary = (struct vol_boundary_s *)malloc(sizeof(struct vol_boundary_s) *
-	            nb_vol);
-	volumes = mbr->volume;
-	printf("volume ptr = %p boundary %p\n", (void *)volumes, (void *)boundary);
-	for(; i < nb_vol; i++){
-		boundary[i].first_cyl = volumes[i].start_cyl;
-		boundary[i].first_sec = volumes[i].start_sec;
-		convert_bloc(i, volumes[i].nsector, &cyl, &sec);
-		boundary[i].last_cyl = cyl;
-		boundary[i].last_sec = sec;
-	}
-	return boundary;
-}
-
-
 int chck_possible(unsigned int fc, unsigned int fs, unsigned int size){
-	struct vol_boundary_s *boundary;
-	int i = 0;
+	int i  = 0;
+	int lc = fc;                    /* last cylinder */
+	int ls = fs;                    /* last sector */
+	int rest;                       /* the number of sector remaining */
+
 	if(!mbr)
 		mbr = get_mbr();
 
-	if(mbr->nvol == 0)
-		return 1;
+	lc = size / HDA_MAXSECTOR;
+	rest = size % HDA_MAXSECTOR;
+	ls = rest - (rest - fs) - 1;
 
-	boundary = init_boundary(mbr->nvol);
 	for(; i < mbr->nvol; i++){
-		if((fc >= boundary[i].first_cyl) && (fs >= boundary[i].first_sec)
-		    && (fc <= boundary[i].last_cyl) && (fs <= boundary[i].last_sec)){
+		printf("start = %d, end = %d", convert_cyl_sec(i, fc, fs), convert_cyl_sec(i, lc, ls));
+		if((convert_cyl_sec(i, fc, fs) != -1) ||
+		   (convert_cyl_sec(i, lc, ls) != -1)){
 			return 0;
 		}
 	}

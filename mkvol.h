@@ -14,11 +14,4 @@
 #define ERR_NEG     3
 #define ERR_MX_VOL  4
 
-struct vol_boundary_s{
-	unsigned int first_cyl;
-	unsigned int first_sec;
-	unsigned int last_cyl;
-	unsigned int last_sec;
-};
-
 #endif

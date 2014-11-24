@@ -157,24 +157,17 @@ int convert_cyl_sec(unsigned int nvol, unsigned int cyl,
 	if(!mbr)
 		init_mbr_s();
 
-	if(mbr->nvol == 0)
+	if(mbr->nvol == 0 || mbr->nvol <= nvol)
 		return -1;
 
 	vol = mbr->volume[nvol];
 
-	if(vol.start_cyl == cyl){
-		blc += sec - vol.start_sec;
-	}
-	else{
-		int i;
-		blc += (HDA_MAXSECTOR - vol.start_sec);
-		if(cyl - vol.start_cyl < 0)
-			return -1;
-		for(i = 0; i < cyl - vol.start_cyl; i++){
-			blc += HDA_MAXSECTOR;
-		}
-		blc += sec;
-	}
+	if(cyl < vol.start_cyl || sec < vol.start_sec)
+		return -1;
+
+	blc += abs(cyl - vol.start_cyl + 1) * HDA_MAXSECTOR;
+	blc -= vol.start_sec;
+	blc -= HDA_MAXSECTOR - sec;
 	if (blc <= vol.nsector)
 		return blc;
 	return -1;
