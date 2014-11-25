@@ -170,6 +170,7 @@ int delete_inode(unsigned inumber)
 {
 	int i, j;
 	struct inode_s *inode;
+	/* TODO A revoir, problème de type (unsigned int requis) */
 	unsigned char* buffer_direct = (unsigned char *)malloc(HDA_SECTORSIZE);
 	unsigned char* buffer_indirect = (unsigned char *)malloc(HDA_SECTORSIZE);
 	unsigned char* tmp = (unsigned char *)malloc(HDA_SECTORSIZE);
@@ -220,9 +221,12 @@ int delete_inode(unsigned inumber)
 unsigned int vbloc_of_fbloc(unsigned int inumber, unsigned int fbloc, bool_t do_allocate)
 {
 	struct inode_s inode;
-	int bloc;
+	int bloc, *buffer, i;
 	fbloc--; /* Pour travailler sur les indices directement. */
 	read_inode(inumber, &inode);
+
+	if(fbloc == 0)
+		return 0;
 
 	/* Si le fbloc-ième est référencé directement */
 	if(fbloc < NB_BLOCS)
@@ -240,7 +244,24 @@ unsigned int vbloc_of_fbloc(unsigned int inumber, unsigned int fbloc, bool_t do_
 				return bloc;
 		}
 	/* Si le fbloc-ième est référencé indirectement */
-
+	else if(fbloc < 2 * NB_BLOCS)
+		{
+			buffer = (int *)read_struct(vol_courant, inode.bloc_indirect, sizeof(int *));
+			for(i = 0 ; i < NB_BLOCS ; i++)
+				{
+					bloc = buffer[i];
+					if(bloc == 0)
+						if(do_allocate)
+						{
+							bloc = new_bloc();
+							inode.bloc_direct[fbloc] = bloc;
+						}
+						else
+							return 0;
+					else
+						return bloc;
+				}
+		}	
 	/* Si le fbloc-ième est doublement référencé indirectement */
 
 
