@@ -64,7 +64,9 @@ Description d'un volume :
 
 TODO
 + Ajouter dans le programme de test la mise en place de valeur par défaut.
-+ Création de la structure du superbloc et de la structures
-  de gestions des blocs libres.
-+ Allouer un bloc
-+ Liberer un bloc
++ Dans le fichier filesystem.c, écrire fonction pour lire écrire
+un int* sur un disque.
++ Modifier les fonctions de filesystem.c utilisant write/read_struct sur un
+int * pour utiliser les fonctions appropriées (delete_inode et fbloc...).
+
+
