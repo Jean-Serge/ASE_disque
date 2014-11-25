@@ -38,21 +38,19 @@ extern unsigned int new_bloc();
 
 extern void free_bloc(unsigned int bloc);
 
-#endif
-
 
 /****************************  Gestion des inodes *****************************/
 #define NB_BLOCS 12
 
 enum file_type_e {
-  NORMAL, 
-  REPOSITORY, 
-  LINK, 
+  NORMAL,
+  REPOSITORY,
+  LINK,
   SPECIAL
 };
 
 typedef enum {
-  FALSE, 
+  FALSE,
   TRUE
 } bool_t;
 
@@ -72,3 +70,5 @@ extern unsigned int create_inode(enum file_type_e type);
 extern int delete_inode(unsigned int inumber);
 
 extern unsigned int vbloc_of_fbloc(unsigned int inumber, unsigned int fbloc, bool_t do_allocate);
+
+#endif
