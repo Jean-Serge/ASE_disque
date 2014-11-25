@@ -42,6 +42,9 @@ volume: volume.c volume.h
 filesystem: filesystem.c filesystem.h
 	$(CC) $(CFLAGS) -o filesystem.o -c filesystem.c ${INCDIR}
 
+file: filesystem file.c file.h
+	$(CC) $(CFLAGS) -o file.o -c file.c ${INCDIR}
+
 dvol: volume drive dvol.c
 	$(CC) $(CFLAGS) -o dvol.bin drive.o volume.o dvol.c ${LIBS}
 
