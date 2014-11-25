@@ -9,11 +9,12 @@ CFLAGS  += -g
 LIBDIR  = $(ROOTDIR)/lib
 INCDIR  = -I$(ROOTDIR)/include
 LIBS    = -L$(LIBDIR) -lhardware
+SUFFIX  = .bin
 
 ###------------------------------
 ### Main targets
 ###------------------------------------------------------------
-BINARIES= mkhd
+BINARIES= create-disk${SUFFIX}  dmps${SUFFIX}  dvol${SUFFIX}  frmt${SUFFIX}  mkvol${SUFFIX}  print_mbr${SUFFIX}
 OBJECTS	= $(addsuffix .o,\
 	  mkhd)
 
