@@ -61,6 +61,7 @@ struct inode_s{
   int bloc_indirect;
   int bloc_double;
 };
+
 extern void read_inode(unsigned int inumber, struct inode_s* inode);
 
 extern void write_inode(unsigned int inumber, struct inode_s* inode);

@@ -210,3 +210,39 @@ int delete_inode(unsigned inumber)
   free_bloc(inumber);
   return 0;
 }
+
+/**
+ * Essaie de lire le fbloc-ième de l'inode.
+ * Si le bloc est alloué, sont numero est retourné.
+ * Sinon si do_allocate est vrai un nouveau bloc est alloué et retourné
+ * Sinon retourne 0.
+ */
+unsigned int vbloc_of_fbloc(unsigned int inumber, unsigned int fbloc, bool_t do_allocate)
+{
+  struct inode_s inode;
+  int bloc;
+  fbloc--; /* Pour travailler sur les indices directement. */
+  read_inode(inumber, &inode);
+  
+  /* Si le fbloc-ième est référencé directement */
+  if(fbloc < NB_BLOCS)
+    {
+      bloc = inode.bloc_direct[fbloc];
+      if(bloc == 0)
+	if(do_allocate)
+	  {
+	    bloc = new_bloc();
+	    inode.bloc_direct[fbloc] = bloc; 
+	  }
+	else
+	  return 0;
+      else 
+	return bloc;
+    }
+  /* Si le fbloc-ième est référencé indirectement */
+
+  /* Si le fbloc-ième est doublement référencé indirectement */
+
+
+  return 0;
+}
