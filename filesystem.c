@@ -212,6 +212,19 @@ int delete_inode(unsigned inumber)
 	return 0;
 }
 
+unsigned int allocate(int bloc, bool_t do_allocate)
+{
+	if(bloc == 0)
+		if(do_allocate)	
+		{
+			bloc = new_bloc();
+			return bloc;
+		}
+		else
+			return 0;
+	else
+		return bloc;
+}
 /**
  * Essaie de lire le fbloc-ième de l'inode.
  * Si le bloc est alloué, sont numero est retourné.
@@ -221,7 +234,7 @@ int delete_inode(unsigned inumber)
 unsigned int vbloc_of_fbloc(unsigned int inumber, unsigned int fbloc, bool_t do_allocate)
 {
 	struct inode_s inode;
-	int bloc, *buffer, i;
+	int bloc, *buffer;
 	fbloc--; /* Pour travailler sur les indices directement. */
 	read_inode(inumber, &inode);
 
@@ -232,38 +245,26 @@ unsigned int vbloc_of_fbloc(unsigned int inumber, unsigned int fbloc, bool_t do_
 	if(fbloc < NB_BLOCS)
 		{
 			bloc = inode.bloc_direct[fbloc];
-			if(bloc == 0)
-				if(do_allocate)
-					{
-						bloc = new_bloc();
-						inode.bloc_direct[fbloc] = bloc;
-					}
-				else
-					return 0;
-			else
-				return bloc;
+			bloc = allocate(bloc, do_allocate);
+			inode.bloc_direct[fbloc] = bloc;
+			write_inode(inumber, &inode);	
+			return bloc;
 		}
+
 	/* Si le fbloc-ième est référencé indirectement */
 	else if(fbloc < 2 * NB_BLOCS)
 		{
-			buffer = (int *)read_struct(vol_courant, inode.bloc_indirect, sizeof(int *));
-			for(i = 0 ; i < NB_BLOCS ; i++)
-				{
-					bloc = buffer[i];
-					if(bloc == 0)
-						if(do_allocate)
-						{
-							bloc = new_bloc();
-							inode.bloc_direct[fbloc] = bloc;
-						}
-						else
-							return 0;
-					else
-						return bloc;
-				}
+			buffer = (int *)malloc(HDA_SECTORSIZE);
+			read_bloc(vol_courant, inode.bloc_indirect, (unsigned char*)buffer);
+			bloc = buffer[fbloc - NB_BLOCS];
+			bloc = allocate(bloc, do_allocate);
+			/* On écrit le bloc contenant le tableau et non l'inode */
+			write_bloc(vol_courant, inode.bloc_indirect, (unsigned char*)buffer);
+			return bloc;
 		}	
 	/* Si le fbloc-ième est doublement référencé indirectement */
 
-
 	return 0;
 }
+
+
