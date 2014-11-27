@@ -9,7 +9,8 @@ static struct mbr_s *mbr = NULL;
  * Copie size octets de ce contenu dans buffer
  * Retourne le buffer.
  */
-unsigned char* read_struct(unsigned int vol, unsigned int nbloc,  unsigned int size)
+unsigned char* read_struct(unsigned int vol, unsigned int nbloc,
+                           unsigned int size)
 {
 	unsigned char *buffer = (unsigned char *) malloc(HDA_SECTORSIZE);
 
@@ -23,7 +24,8 @@ unsigned char* read_struct(unsigned int vol, unsigned int nbloc,  unsigned int s
  * Ecrit le bloc nbloc avec buffer contenant un structure.
  * Complète avec des \0 pour écrire la totalité du bloc.
  */
-void write_struct(unsigned int vol, unsigned int nbloc, char* buffer, unsigned int size)
+void write_struct(unsigned int vol, unsigned int nbloc, char* buffer,
+                  unsigned int size)
 {
 	int i;
 	char* new_buffer;
@@ -77,7 +79,8 @@ int load_super(unsigned int vol){
 	if(!mbr)
 		mbr = get_mbr();
 
-	super_courant = (struct superbloc_s *) read_struct(vol, 0, sizeof(struct superbloc_s));
+	super_courant = (struct superbloc_s *)
+	    read_struct(vol,0,sizeof(struct superbloc_s));
 	vol_courant = vol;
 
 	return 0;
@@ -87,7 +90,8 @@ void save_super(){
 	if(!mbr)
 		mbr = get_mbr();
 
-	write_struct(vol_courant, 0, (char *) &super_courant, sizeof(struct superbloc_s));
+	write_struct(vol_courant, 0, (char *)&super_courant,
+	             sizeof(struct superbloc_s));
 }
 
 /* Retourne 0 si aucun bloc n'est libre */
@@ -115,7 +119,8 @@ unsigned int new_bloc(){
 		(super_courant->nb_free_node)--;
 		super_courant->free_node = bloc+1;
 
-		write_struct(vol_courant, bloc+1, (char *) &free, sizeof(struct free_bloc_s));
+		write_struct(vol_courant, bloc+1,
+		             (char *) &free, sizeof(struct free_bloc_s));
 		return bloc;
 	}
 }
@@ -138,7 +143,8 @@ void free_bloc(unsigned int bloc){
 
 void read_inode(unsigned int inumber, struct inode_s* inode)
 {
-	inode = (struct inode_s*) read_struct(vol_courant, inumber, sizeof(struct inode_s));
+	inode = (struct inode_s*) read_struct(vol_courant,
+	                                      inumber, sizeof(struct inode_s));
 }
 
 void write_inode(unsigned int inumber, struct inode_s* inode)
@@ -186,7 +192,8 @@ int delete_inode(unsigned inumber)
 		}
 
 	/* Suppression des blocs en référencement indirect */
-	buffer_direct = read_struct(vol_courant, inode->bloc_indirect, sizeof(int *));
+	buffer_direct = read_struct(vol_courant, inode->bloc_indirect,
+	                            sizeof(int *));
 	for(i = 0 ; i < NB_BLOCS ; i++)
 		{
 			if(buffer_indirect[i] == 0)
@@ -195,7 +202,8 @@ int delete_inode(unsigned inumber)
 		}
 
 	/* Suppression des blocs en double référencement indirect */
-	buffer_indirect = read_struct(vol_courant, inode->bloc_double, sizeof(int *));
+	buffer_indirect = read_struct(vol_courant, inode->bloc_double,
+	                              sizeof(int *));
 	for(i = 0 ; i < NB_BLOCS ; i++)
 		{
 			tmp = read_struct(vol_courant, buffer_indirect[i], sizeof(int *));
@@ -215,7 +223,7 @@ int delete_inode(unsigned inumber)
 unsigned int allocate(int bloc, bool_t do_allocate)
 {
 	if(bloc == 0)
-		if(do_allocate)	
+		if(do_allocate)
 		{
 			bloc = new_bloc();
 			return bloc;
@@ -231,7 +239,8 @@ unsigned int allocate(int bloc, bool_t do_allocate)
  * Sinon si do_allocate est vrai un nouveau bloc est alloué et retourné
  * Sinon retourne 0.
  */
-unsigned int vbloc_of_fbloc(unsigned int inumber, unsigned int fbloc, bool_t do_allocate)
+unsigned int vbloc_of_fbloc(unsigned int inumber, unsigned int fbloc,
+                            bool_t do_allocate)
 {
 	struct inode_s inode;
 	int bloc, *buffer;
@@ -247,7 +256,7 @@ unsigned int vbloc_of_fbloc(unsigned int inumber, unsigned int fbloc, bool_t do_
 			bloc = inode.bloc_direct[fbloc];
 			bloc = allocate(bloc, do_allocate);
 			inode.bloc_direct[fbloc] = bloc;
-			write_inode(inumber, &inode);	
+			write_inode(inumber, &inode);
 			return bloc;
 		}
 
@@ -259,12 +268,11 @@ unsigned int vbloc_of_fbloc(unsigned int inumber, unsigned int fbloc, bool_t do_
 			bloc = buffer[fbloc - NB_BLOCS];
 			bloc = allocate(bloc, do_allocate);
 			/* On écrit le bloc contenant le tableau et non l'inode */
-			write_bloc(vol_courant, inode.bloc_indirect, (unsigned char*)buffer);
+			write_bloc(vol_courant, inode.bloc_indirect,
+			           (unsigned char*)buffer);
 			return bloc;
-		}	
+		}
 	/* Si le fbloc-ième est doublement référencé indirectement */
 
 	return 0;
 }
-
-

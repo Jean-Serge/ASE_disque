@@ -86,6 +86,7 @@ extern unsigned int create_inode(enum file_type_e type);
 
 extern int delete_inode(unsigned int inumber);
 
-extern unsigned int vbloc_of_fbloc(unsigned int inumber, unsigned int fbloc, bool_t do_allocate);
+extern unsigned int vbloc_of_fbloc(unsigned int inumber, unsigned int fbloc,
+                                   bool_t do_allocate);
 
 #endif
