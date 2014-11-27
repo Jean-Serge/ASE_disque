@@ -14,19 +14,19 @@ extern unsigned int create_ifile(enum file_type_e type);
 */
 extern int delete_ifile(unsigned int inumber);
 
-enum opened_e = {YES, NO};
+enum modified_e = {YES, NO};
 
 struct file_desc_t{
 	unsigned int inoeud;
 	unsigned int cursor;
 	unsigned int size;
 	unsigned char *file_buffer;
-	enum opened_e opened;
+	enum modified_e modified;
 }
 
 
+extern int open_ifile(file_desc_t *fd, unsigned int inumber);
 
-/* extern int open_ifile(file_desc_t *fd, unsigned int inumber); */
 /* extern void close_ifile(file_desc_t *fd); */
 /* extern void flush_ifile(file_desc_t *fd); */
 /* extern void seek_ifile(file_desc_t *fd, int r_offset);  /\* relatif *\/ */
