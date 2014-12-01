@@ -52,7 +52,7 @@ mkvol: volume drive mkvol.c
 	$(CC) $(CFLAGS) -o mkvol${SUFFIX} drive.o volume.o mkvol.c ${LIBS}
 
 mknfs: volume drive filesystem mknfs.c
-	$(CC) $(CFLAGS) -o mkvol${SUFFIX} drive.o volume.o filesystem.o mknfs.c ${LIBS}
+	$(CC) $(CFLAGS) -o mknfs${SUFFIX} drive.o volume.o filesystem.o mknfs.c ${LIBS}
 
 print_mbr: volume drive print_mbr.c
 	$(CC) $(CFLAGS) -o print_mbr${SUFFIX} drive.o volume.o print_mbr.c ${LIBS}
