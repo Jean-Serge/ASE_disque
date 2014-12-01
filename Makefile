@@ -4,7 +4,7 @@
 ROOTDIR=.
 
 CC	= gcc
-CFLAGS	= -Wall -ansi -pedantic
+CFLAGS	= -Wall -ansi # -pedantic
 CFLAGS  += -g
 LIBDIR  = $(ROOTDIR)/lib
 INCDIR  = -I$(ROOTDIR)/include
@@ -56,6 +56,9 @@ print_mbr: volume drive print_mbr.c
 
 test_convert_blc: volume drive test/test_convert_blc.c
 	$(CC) $(CFLAGS) -o test_convert_blc.bin drive.o volume.o test/test_convert_blc.c ${LIBS}
+
+tfile: file drive volume filesystem volume t_file.c
+	$(CC) $(CFLAGS) -o tfile drive.o volume.o  filesystem.o file.o t_file.c ${LIBS}
 
 
 ###------------------------------
