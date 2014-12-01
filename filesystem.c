@@ -61,8 +61,11 @@ void init_super(unsigned int vol){
 	/* TODO à voir pour le n° de série, pour l'instant
 	   je prend le n° du volume */
 	super.serial = vol;
+/**********************************************************************/
+/* JS, tu peux corriger la ligne suivante, j'ai mis le 14 à l'arrache */
+/**********************************************************************/
+	super.nom = (char *)malloc(sizeof(char) * 14);
 	super.nom = strcpy(super.nom, "Nom_A_Definir");
-
 	/* On écrit le super dans le 1er bloc */
 	super.nb_free_node = volume.nsector-1;
 	super.inoeud = volume.start_cyl * HDA_MAXSECTOR + volume.start_sec;
