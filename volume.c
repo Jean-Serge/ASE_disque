@@ -106,7 +106,7 @@ int convert_bloc(unsigned int nvol, unsigned int bloc, unsigned int *cyl,
 		return -1;
 	}
 	vol = mbr->volume[nvol];
-	*cyl = (vol.start_cyl + (vol.start_sec + bloc) + HDA_MAXSECTOR);
+	*cyl = (vol.start_cyl + (vol.start_sec + bloc) / HDA_MAXSECTOR);
 	*sec = (vol.start_sec + bloc) % HDA_MAXSECTOR;
 	return 0;
 }
