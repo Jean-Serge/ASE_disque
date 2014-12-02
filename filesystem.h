@@ -23,6 +23,7 @@ extern unsigned char* read_struct(unsigned int vol, unsigned int nbloc,
 /**************************  Gestion des superblocs ***************************/
 #define SUPER_MAGIC   0xABCD
 #define SUPER_SZ_NAME 32
+#define FREE_MAGIC    0xDCBA
 
 
 struct superbloc_s{
@@ -35,6 +36,7 @@ struct superbloc_s{
 };
 
 struct free_bloc_s{
+	int magic;          /* 2 octets */
 	int nb_free_blocs;  /* 2 octets */
 	int next;           /* 2 octets */
 };
