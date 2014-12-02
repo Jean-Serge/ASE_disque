@@ -5,44 +5,8 @@ static struct mbr_s *mbr = NULL;
 /***************************** Fonctions utiles *******************************/
 
 /**
- * Lit le bloc indiqué du volume.
- * Copie size octets de ce contenu dans buffer
- * Retourne le buffer.
+   Écrit la structure superbloc_s sur le bloc 0 du volume vol.
  */
-unsigned char* read_struct(unsigned int vol, unsigned int nbloc,
-                           unsigned int size)
-{
-	unsigned char *buffer = (unsigned char *) malloc(HDA_SECTORSIZE);
-
-	read_bloc(vol, nbloc, buffer);
-	buffer = (unsigned char *) realloc(buffer, size);
-
-	return buffer;
-}
-
-/**
- * Ecrit le bloc nbloc avec buffer contenant un structure.
- * Complète avec des \0 pour écrire la totalité du bloc.
- */
-void write_struct(unsigned int vol, unsigned int nbloc, char* buffer,
-                  unsigned int size){
-	int i;
-	char* new_buffer;
-
-	new_buffer = (char *) malloc(size);
-	new_buffer = memcpy(new_buffer, buffer, size);
-	new_buffer = (char*) realloc(new_buffer, HDA_SECTORSIZE);
-
-	for(i = size ; i < HDA_SECTORSIZE ; i++)
-		{
-			*(new_buffer+i) = '0';
-		}
-	for(i = 0; i < HDA_SECTORSIZE; i++){
-		printf("%x ", new_buffer[i]);
-	}
-	write_bloc(vol, 0, (const unsigned char*)new_buffer);
-}
-
 void write_super_blc(unsigned int vol, struct superbloc_s *super_blc){
 	unsigned char *buf = (unsigned char *)calloc(HDA_SECTORSIZE,
 	                                             sizeof(unsigned char));
@@ -65,11 +29,10 @@ void write_super_blc(unsigned int vol, struct superbloc_s *super_blc){
 	buf[8] = super_blc->first_free >>8;
 	buf[9] = ((super_blc->first_free<<8)>>8) & 0xFF;
 	/* écrire le nom du volume */
-	while(super_blc->nom[i] != '\0'){
-		buf[10+i] = super_blc->nom[i++];
+	while(super_blc->name[i] != '\0'){
+		buf[10+i] = super_blc->name[i];
+		i++;
 	}
-
-
 	write_bloc(vol, 1, buf);
 }
 
@@ -102,8 +65,8 @@ void init_super(unsigned int vol){
 	write_super_blc(vol, super);
 
 	/* On écrit la structure de bloc libres dans le 2nd bloc */
-	/* free.nb_free_blocs = volume.nsector-1; */
-	/* free.next = 0; */
+	free.nb_free_blocs = volume.nsector-1;
+	free.next = 0;
 	/* write_struct(vol, 0, (char *) &free, sizeof(struct free_bloc_s)); */
 }
 

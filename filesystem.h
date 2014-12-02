@@ -19,13 +19,6 @@
 extern unsigned char* read_struct(unsigned int vol, unsigned int nbloc,
                                   unsigned int size);
 
-/**
- * Ecrit le bloc nbloc avec buffer contenant un structure.
- * Complète avec des \0 pour écrire la totalité du bloc.
- */
-extern void write_struct(unsigned int vol, unsigned int nbloc,
-                         char* buffer, unsigned int size);
-
 
 /**************************  Gestion des superblocs ***************************/
 #define SUPER_MAGIC   0xABCD
