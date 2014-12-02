@@ -28,15 +28,17 @@ extern void write_struct(unsigned int vol, unsigned int nbloc,
 
 
 /**************************  Gestion des superblocs ***************************/
-#define SUPER_MAGIC 0xD0D0
+#define SUPER_MAGIC   0xABCD
+#define SUPER_SZ_NAME 32
+
 
 struct superbloc_s{
-	int magic;
-	int serial;
-	int inoeud;
-	int nb_free_node;
-	int free_node;
-	char *nom;
+	int magic;          /* 2 octets */
+	int serial;         /* 4 octets timestamp */
+	int inode;         /* 2 octets */
+	int nb_free_blc;   /* 2 octets */
+	int first_free;      /* 2 octets */
+	char *name;          /* 32 octets */
 };
 
 struct free_bloc_s{

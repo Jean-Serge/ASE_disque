@@ -25,8 +25,7 @@ unsigned char* read_struct(unsigned int vol, unsigned int nbloc,
  * Complète avec des \0 pour écrire la totalité du bloc.
  */
 void write_struct(unsigned int vol, unsigned int nbloc, char* buffer,
-                  unsigned int size)
-{
+                  unsigned int size){
 	int i;
 	char* new_buffer;
 
@@ -36,10 +35,42 @@ void write_struct(unsigned int vol, unsigned int nbloc, char* buffer,
 
 	for(i = size ; i < HDA_SECTORSIZE ; i++)
 		{
-			*(new_buffer+i) = '\0';
+			*(new_buffer+i) = '0';
 		}
-
+	for(i = 0; i < HDA_SECTORSIZE; i++){
+		printf("%x ", new_buffer[i]);
+	}
 	write_bloc(vol, 0, (const unsigned char*)new_buffer);
+}
+
+void write_super_blc(unsigned int vol, struct superbloc_s *super_blc){
+	unsigned char *buf = (unsigned char *)calloc(HDA_SECTORSIZE,
+	                                             sizeof(unsigned char));
+	int i = 0;
+	/* écriture du magic */
+	buf[0] = super_blc->magic >> 8;
+	buf[1] = ((super_blc->magic<<8)>>8) & 0xFF;
+	/* écriture du numéro de série */
+	buf[2] = super_blc->serial >> 24;
+	buf[3] = (super_blc->serial >> 16);
+	buf[4] = (super_blc->serial >> 8);
+	buf[5] = super_blc->serial;
+	/* écriture du prochain inœud */
+	buf[6] = super_blc->inode >>8;
+	buf[7] = ((super_blc->inode<<8)>>8) & 0xFF;
+	/* écrire du nombre d'inode libre */
+	buf[8] = super_blc->nb_free_blc >>8;
+	buf[9] = ((super_blc->nb_free_blc<<8)>>8) & 0xFF;
+	/* écrire le premier l'adresse bloc libre */
+	buf[8] = super_blc->first_free >>8;
+	buf[9] = ((super_blc->first_free<<8)>>8) & 0xFF;
+	/* écrire le nom du volume */
+	while(super_blc->nom[i] != '\0'){
+		buf[10+i] = super_blc->nom[i++];
+	}
+
+
+	write_bloc(vol, 1, buf);
 }
 
 /************************** Gestion des superblocs ****************************/
@@ -47,35 +78,33 @@ static int vol_courant;
 static struct superbloc_s *super_courant = NULL;
 
 void init_super(unsigned int vol){
-	struct superbloc_s super;
+	struct superbloc_s *super;
 	struct volume_s volume;
-	struct free_bloc_s free;
+	/* struct free_bloc_s free; */
 
 	if(!mbr)
 		mbr = get_mbr();
 
 	volume = mbr->volume[vol];
 
-	super.magic = SUPER_MAGIC;
+	super = (struct superbloc_s *)malloc(sizeof(struct superbloc_s));
+	super->magic = SUPER_MAGIC;
 
 	/* TODO à voir pour le n° de série, pour l'instant
 	   je prend le n° du volume */
-	super.serial = vol;
-/**********************************************************************/
-/* JS, tu peux corriger la ligne suivante, j'ai mis le 14 à l'arrache */
-/**********************************************************************/
-	super.nom = (char *)malloc(sizeof(char) * 14);
-	super.nom = strcpy(super.nom, "Nom_A_Definir");
+	super->serial = 0x00112233;
+	super->name = (char *)malloc(sizeof(char) * SUPER_SZ_NAME);
+	super->name = strncpy(super->name, "no_name_volume", SUPER_SZ_NAME);
 	/* On écrit le super dans le 1er bloc */
-	super.nb_free_node = volume.nsector-1;
-	super.inoeud = volume.start_cyl * HDA_MAXSECTOR + volume.start_sec;
-	super.free_node = 1;
-	write_struct(vol, 0, (char *) &super, sizeof(struct superbloc_s));
+	super->nb_free_blc = volume.nsector-1;
+	super->inode = volume.start_cyl * HDA_MAXSECTOR + volume.start_sec;
+	super->first_free = 1;
+	write_super_blc(vol, super);
 
 	/* On écrit la structure de bloc libres dans le 2nd bloc */
-	free.nb_free_blocs = volume.nsector-1;
-	free.next = 0;
-	write_struct(vol, 0, (char *) &free, sizeof(struct free_bloc_s));
+	/* free.nb_free_blocs = volume.nsector-1; */
+	/* free.next = 0; */
+	/* write_struct(vol, 0, (char *) &free, sizeof(struct free_bloc_s)); */
 }
 
 int load_super(unsigned int vol){
@@ -92,7 +121,7 @@ int load_super(unsigned int vol){
 void save_super(){
 	if(!mbr)
 		mbr = get_mbr();
-
+	printf("Save super\n");
 	write_struct(vol_courant, 0, (char *)&super_courant,
 	             sizeof(struct superbloc_s));
 }
@@ -100,10 +129,10 @@ void save_super(){
 /* Retourne 0 si aucun bloc n'est libre */
 unsigned int new_bloc(){
 	/* On récupère le 1er bloc libre du superbloc */
-	unsigned int bloc = super_courant->free_node;
+	unsigned int bloc = super_courant->first_free;
 	struct free_bloc_s free;
 
-	if(super_courant->nb_free_node == 0){
+	if(super_courant->nb_free_blc == 0){
 		return 0;
 	}
 
@@ -112,15 +141,15 @@ unsigned int new_bloc(){
 
 	/* Cas où le premier bloc libre est le seul de sa série */
 	if(free.nb_free_blocs < 2){
-		super_courant->free_node = free.next;
-		(super_courant->nb_free_node)--;
+		super_courant->first_free = free.next;
+		(super_courant->nb_free_blc)--;
 		return bloc;
 	}
 	else{
 		/* On écrit la structure dans le bloc libre suivant */
 		(free.nb_free_blocs)--;
-		(super_courant->nb_free_node)--;
-		super_courant->free_node = bloc+1;
+		(super_courant->nb_free_blc)--;
+		super_courant->first_free = bloc+1;
 
 		write_struct(vol_courant, bloc+1,
 		             (char *) &free, sizeof(struct free_bloc_s));
@@ -135,8 +164,8 @@ void free_bloc(unsigned int bloc){
 		mbr = get_mbr();
 
 	free.nb_free_blocs = 1;
-	free.next = super_courant->free_node;
-	super_courant->free_node = bloc;
+	free.next = super_courant->first_free;
+	super_courant->first_free = bloc;
 
 	write_struct(vol_courant, bloc, (char *) &free, sizeof(struct free_bloc_s));
 }
