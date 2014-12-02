@@ -27,16 +27,16 @@ extern unsigned char* read_struct(unsigned int vol, unsigned int nbloc,
 
 struct superbloc_s{
 	int magic;          /* 2 octets */
-	int serial;         /* 4 octets timestamp */
-	int inode;         /* 2 octets */
-	int nb_free_blc;   /* 2 octets */
-	int first_free;      /* 2 octets */
-	char *name;          /* 32 octets */
+	int serial;         /* 4 octets : timestamp */
+	int inode;          /* 2 octets */
+	int nb_free_blc;    /* 2 octets */
+	int first_free;     /* 2 octets */
+	char *name;         /* 32 octets */
 };
 
 struct free_bloc_s{
-	int nb_free_blocs;
-	int next;
+	int nb_free_blocs;  /* 2 octets */
+	int next;           /* 2 octets */
 };
 
 extern void init_super(unsigned int vol);

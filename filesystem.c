@@ -5,6 +5,23 @@ static struct mbr_s *mbr = NULL;
 /***************************** Fonctions utiles *******************************/
 
 /**
+   Écrit la structure free_bloc_s free_blc sur le bloc bloc du volume vol.
+ */
+void write_free_bloc(unsigned int vol, unsigned int bloc,
+                     struct free_bloc_s *free_blc){
+	unsigned char *buf = (unsigned char *)calloc(HDA_SECTORSIZE,
+	                                             sizeof(unsigned char));
+	/* Écriture du nombre de bloc libre */
+	buf[0] = free_blc->nb_free_blocs >> 8;
+	buf[1] = ((free_blc->nb_free_blocs<<8)>>8) & 0xFF;
+
+	/* Écriture de l'adresse de la prochaine série de bloc libre */
+	buf[2] = free_blc->next >> 8;
+	buf[3] = ((free_blc->next<<8)>>8) & 0xFF;
+	write_bloc(vol, bloc, buf);
+}
+
+/**
    Écrit la structure superbloc_s sur le bloc 0 du volume vol.
  */
 void write_super_blc(unsigned int vol, struct superbloc_s *super_blc){
@@ -14,26 +31,31 @@ void write_super_blc(unsigned int vol, struct superbloc_s *super_blc){
 	/* écriture du magic */
 	buf[0] = super_blc->magic >> 8;
 	buf[1] = ((super_blc->magic<<8)>>8) & 0xFF;
+
 	/* écriture du numéro de série */
 	buf[2] = super_blc->serial >> 24;
 	buf[3] = (super_blc->serial >> 16);
 	buf[4] = (super_blc->serial >> 8);
 	buf[5] = super_blc->serial;
+
 	/* écriture du prochain inœud */
 	buf[6] = super_blc->inode >>8;
 	buf[7] = ((super_blc->inode<<8)>>8) & 0xFF;
+
 	/* écrire du nombre d'inode libre */
 	buf[8] = super_blc->nb_free_blc >>8;
 	buf[9] = ((super_blc->nb_free_blc<<8)>>8) & 0xFF;
+
 	/* écrire le premier l'adresse bloc libre */
 	buf[8] = super_blc->first_free >>8;
 	buf[9] = ((super_blc->first_free<<8)>>8) & 0xFF;
+
 	/* écrire le nom du volume */
 	while(super_blc->name[i] != '\0'){
 		buf[10+i] = super_blc->name[i];
 		i++;
 	}
-	write_bloc(vol, 1, buf);
+	write_bloc(vol, 0, buf);
 }
 
 /************************** Gestion des superblocs ****************************/
@@ -43,7 +65,7 @@ static struct superbloc_s *super_courant = NULL;
 void init_super(unsigned int vol){
 	struct superbloc_s *super;
 	struct volume_s volume;
-	/* struct free_bloc_s free; */
+	struct free_bloc_s *free_blc;
 
 	if(!mbr)
 		mbr = get_mbr();
@@ -64,10 +86,14 @@ void init_super(unsigned int vol){
 	super->first_free = 1;
 	write_super_blc(vol, super);
 
-	/* On écrit la structure de bloc libres dans le 2nd bloc */
-	free.nb_free_blocs = volume.nsector-1;
-	free.next = 0;
-	/* write_struct(vol, 0, (char *) &free, sizeof(struct free_bloc_s)); */
+
+	free_blc = (struct free_bloc_s *)malloc(sizeof(struct free_bloc_s));
+	/* todo revoir le calcul du nombre de bloc n'ont lu */
+	free_blc->nb_free_blocs = volume.nsector-1;
+	free_blc->next = 0;
+	write_free_bloc(vol, 1, free_blc);
+	free(free_blc);
+	free(super);
 }
 
 int load_super(unsigned int vol){
@@ -85,8 +111,7 @@ void save_super(){
 	if(!mbr)
 		mbr = get_mbr();
 	printf("Save super\n");
-	write_struct(vol_courant, 0, (char *)&super_courant,
-	             sizeof(struct superbloc_s));
+	write_super_blc(vol_courant, super_courant);
 }
 
 /* Retourne 0 si aucun bloc n'est libre */
@@ -114,8 +139,7 @@ unsigned int new_bloc(){
 		(super_courant->nb_free_blc)--;
 		super_courant->first_free = bloc+1;
 
-		write_struct(vol_courant, bloc+1,
-		             (char *) &free, sizeof(struct free_bloc_s));
+		write_free_bloc(vol_courant, bloc+1, &free);
 		return bloc;
 	}
 }
@@ -130,7 +154,7 @@ void free_bloc(unsigned int bloc){
 	free.next = super_courant->first_free;
 	super_courant->first_free = bloc;
 
-	write_struct(vol_courant, bloc, (char *) &free, sizeof(struct free_bloc_s));
+	write_free_bloc(vol_courant, bloc, &free);
 }
 
 
@@ -144,7 +168,12 @@ void read_inode(unsigned int inumber, struct inode_s* inode)
 
 void write_inode(unsigned int inumber, struct inode_s* inode)
 {
-	write_struct(vol_courant, inumber, (char *) inode, sizeof(struct inode_s));
+	/* write_struct(vol_courant, inumber, (char *) inode, sizeof(struct inode_s)); */
+}
+
+
+unsigned char *read_struct(unsigned int vol, unsigned int bloc, unsigned int size){
+	return NULL;
 }
 
 unsigned int create_inode(enum file_type_e type)
