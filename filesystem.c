@@ -197,9 +197,11 @@ void save_super(){
    Retourne 0 si aucun bloc n'est libre.
  */
 unsigned int new_bloc(){
+	/************/
+	/* À TESTER */
+	/************/
 	/* On récupère le 1er bloc libre du superbloc */
-	unsigned int bloc = super_courant->first_free;
-	struct free_bloc_s free;
+	struct free_bloc_s *free_blc;
 
 	if(super_courant->nb_free_blc == 0){
 		return 0;
@@ -209,21 +211,18 @@ unsigned int new_bloc(){
 		mbr = get_mbr();
 
 	/* Cas où le premier bloc libre est le seul de sa série */
-	if(free.nb_free_blocs == 1){
-		super_courant->first_free = free.next;
-		(super_courant->nb_free_blc)--;
-		return bloc;
+	free_blc = read_free_bloc(vol_courant, super_courant->first_free);
+	if(free_blc->nb_free_blocs == 1){
+		super_courant->first_free = free_blc->next;
+		return super_courant->first_free;
 	}
 	else{
-		/* On écrit la structure dans le bloc libre suivant */
-		(free.nb_free_blocs)--;
-		(super_courant->nb_free_blc)--;
-		super_courant->first_free = bloc+1;
-
-		write_free_bloc(vol_courant, bloc+1, &free);
-		return bloc;
+		free_blc->nb_free_blocs--;
+		super_courant->first_free++;
+		return super_courant->first_free-1;
 	}
 }
+
 /**
    Libére le bloc passé en paramêtre.
  */

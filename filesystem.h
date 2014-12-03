@@ -38,7 +38,7 @@ struct superbloc_s{
 struct free_bloc_s{
 	int magic;          /* 2 octets */
 	int nb_free_blocs;  /* 2 octets */
-	int next;           /* 2 octets */
+	int next;           /* 2 octets 0 si pas d'autre free_blc*/
 };
 
 extern void init_super(unsigned int vol);
