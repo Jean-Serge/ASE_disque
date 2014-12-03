@@ -23,7 +23,10 @@ void write_free_bloc(unsigned int vol, unsigned int bloc,
 	buf[5] = ((free_blc->next<<8)>>8) & 0xFF;
 	write_bloc(vol, bloc, buf);
 }
-
+/**
+   Retourne la structure free_bloc_s du bloc bloc sur le volume vol.
+   Stoppe le fonctionnement du programme si le magic n'est pas correct.
+ */
 struct free_bloc_s *read_free_bloc(unsigned int vol, unsigned int bloc){
 	struct free_bloc_s *free_blc;
 	unsigned char *buf = (unsigned char *)malloc(sizeof(char) * HDA_SECTORSIZE);
@@ -79,6 +82,10 @@ void write_super_bloc(unsigned int vol, struct superbloc_s *super_blc){
 	write_bloc(vol, 0, buf);
 }
 
+/**
+   Retourne le super bloc du volume passé en paramêtre.
+   Stoppe l'éxécution du programme si le magic n'est pas correct.
+ */
 struct superbloc_s *read_super_bloc(unsigned int vol){
 	struct superbloc_s *super;
 	char *buf;
@@ -111,6 +118,9 @@ struct superbloc_s *read_super_bloc(unsigned int vol){
 static int vol_courant;
 static struct superbloc_s *super_courant = NULL;
 
+/**
+   Initialise le superbloc du volume vol.
+ */
 void init_super(unsigned int vol){
 	struct superbloc_s *super;
 	struct volume_s volume;
@@ -146,6 +156,11 @@ void init_super(unsigned int vol){
 	free(super);
 }
 
+/**
+   Charge le superbloc du volume passé en paramêtre.
+   Attention, cette fonction remplace le superbloc du volume courant,
+   le volume courant change.
+*/
 int load_super(unsigned int vol){
 	if(!mbr)
 		mbr = get_mbr();
@@ -159,7 +174,7 @@ int load_super(unsigned int vol){
 }
 
 /**
-   Enregistre le superbloc courant sur le disque
+   Enregistre le superbloc courant sur le disque.
  */
 void save_super(){
 	if(!mbr)
