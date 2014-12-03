@@ -68,8 +68,8 @@ typedef enum {
 } bool_t;
 
 struct inode_s{
-  enum file_type_e type;
-  int taille;
+  enum file_type_e type; /* 1 octet */
+  int taille; /* 2 octets */
   int *bloc_direct;
   int bloc_indirect;
   int bloc_double;

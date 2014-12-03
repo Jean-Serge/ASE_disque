@@ -114,6 +114,16 @@ struct superbloc_s *read_super_bloc(unsigned int vol){
 	return super;
 }
 
+
+void read_inode(unsigned int inumber, struct inode_s* inode){
+
+}
+
+void write_inode(unsigned int inumber, struct inode_s* inode){
+	/* TODO */
+	/* write_struct(vol_courant, inumber, (char *) inode, sizeof(struct inode_s)); */
+}
+
 /************************** Gestion des superblocs ****************************/
 static int vol_courant;
 static struct superbloc_s *super_courant = NULL;
@@ -148,7 +158,6 @@ void init_super(unsigned int vol){
 
 	free_blc = (struct free_bloc_s *)malloc(sizeof(struct free_bloc_s));
 	free_blc->magic = FREE_MAGIC;
-	/* todo revoir le calcul du nombre de bloc n'ont lu */
 	free_blc->nb_free_blocs = volume.nsector-1;
 	free_blc->next = 0;
 	write_free_bloc(vol, 1, free_blc);
@@ -200,7 +209,7 @@ unsigned int new_bloc(){
 		mbr = get_mbr();
 
 	/* Cas où le premier bloc libre est le seul de sa série */
-	if(free.nb_free_blocs < 2){
+	if(free.nb_free_blocs == 1){
 		super_courant->first_free = free.next;
 		(super_courant->nb_free_blc)--;
 		return bloc;
@@ -234,16 +243,6 @@ void free_bloc(unsigned int bloc){
 
 /**************************** Gestion des inodes ******************************/
 
-void read_inode(unsigned int inumber, struct inode_s* inode){
-	/* TODO */
-	inode = (struct inode_s*) read_struct(vol_courant,
-	                                      inumber, sizeof(struct inode_s));
-}
-
-void write_inode(unsigned int inumber, struct inode_s* inode){
-	/* TODO */
-	/* write_struct(vol_courant, inumber, (char *) inode, sizeof(struct inode_s)); */
-}
 
 
 unsigned char *read_struct(unsigned int vol, unsigned int bloc, unsigned int size){
