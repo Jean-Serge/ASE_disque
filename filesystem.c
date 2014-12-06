@@ -227,16 +227,25 @@ unsigned int new_bloc(){
    Libére le bloc passé en paramêtre.
  */
 void free_bloc(unsigned int bloc){
-	struct free_bloc_s free;
+	struct free_bloc_s *first_free;
+	struct free_bloc_s *nw_first_free;
+	if(super_courant == NULL){
+	 	super_courant = read_super_bloc(vol_courant);
+	}
 
-	if(!mbr)
-		mbr = get_mbr();
+	first_free = read_free_bloc(vol_courant, super_courant->first_free);
 
-	free.nb_free_blocs = 1;
-	free.next = super_courant->first_free;
+	nw_first_free = (struct free_bloc_s *)malloc(sizeof(struct free_bloc_s));
+	nw_first_free->magic = FREE_MAGIC;
+	nw_first_free->nb_free_blocs = 1;
+	nw_first_free->next = first_free->next;
+
 	super_courant->first_free = bloc;
-
-	write_free_bloc(vol_courant, bloc, &free);
+	write_free_bloc(vol_courant, bloc, nw_first_free);
+	super_courant->nb_free_blc--;
+	write_super_bloc(vol_courant, super_courant);
+	free(nw_first_free);
+	free(first_free);
 }
 
 
