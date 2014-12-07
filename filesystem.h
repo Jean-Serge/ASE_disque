@@ -53,26 +53,29 @@ extern void free_bloc(unsigned int bloc);
 
 
 /****************************  Gestion des inodes *****************************/
-#define NB_BLOCS 12
+#define NB_BLOCS    10
+#define INODE_MAGIC 0xCAFE
+#define NULL_BLOC   0
 
 enum file_type_e {
-  NORMAL,
-  REPOSITORY,
-  LINK,
-  SPECIAL
+	NORMAL,
+	REPOSITORY,
+	LINK,
+	SPECIAL
 };
 
 typedef enum {
-  FALSE,
-  TRUE
+	FALSE,
+	TRUE
 } bool_t;
 
 struct inode_s{
-  enum file_type_e type; /* 1 octet */
-  int taille; /* 2 octets */
-  int *bloc_direct;
-  int bloc_indirect;
-  int bloc_double;
+	int magic;                      /* 2 octets */
+	enum file_type_e type;          /* 1 octet */
+	int taille;                     /* 2 octets */
+	int bloc_direct[NB_BLOCS];      /* NB_BLOCS * 2 octets */
+	int bloc_indirect;              /* 2 octets */
+	int bloc_double;                /* 2 octets */
 };
 
 extern void read_inode(unsigned int inumber, struct inode_s* inode);

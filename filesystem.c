@@ -114,16 +114,6 @@ struct superbloc_s *read_super_bloc(unsigned int vol){
 	return super;
 }
 
-
-void read_inode(unsigned int inumber, struct inode_s* inode){
-
-}
-
-void write_inode(unsigned int inumber, struct inode_s* inode){
-	/* TODO */
-	/* write_struct(vol_courant, inumber, (char *) inode, sizeof(struct inode_s)); */
-}
-
 /************************** Gestion des superblocs ****************************/
 static int vol_courant;
 static struct superbloc_s *super_courant = NULL;
@@ -250,91 +240,96 @@ void free_bloc(unsigned int bloc){
 
 
 /**************************** Gestion des inodes ******************************/
+void read_inode(unsigned int inumber, struct inode_s* inode){
+	unsigned char *buf = (unsigned char *)malloc(sizeof(char) * HDA_SECTORSIZE);
+	int tmp;
+	int i;
+	inode = (struct inode_s *)malloc(sizeof(struct inode_s));
+	read_bloc(vol_courant, inumber, buf);
 
+	/* lecture du magic */
+	inode->magic = buf[0] + (buf[1] <<8);
+	assert(inode->magic == INODE_MAGIC);
 
+	/* lecture du type du fichier */
+	tmp = buf[2];
+	switch(tmp){
+	case NORMAL:
+		inode->type = NORMAL;
+		break;
+	case REPOSITORY:
+		inode->type = REPOSITORY;
+		break;
+	case LINK:
+		inode->type = LINK;
+		break;
+	 case SPECIAL:
+		inode->type = SPECIAL;
+		break;
+	default:
+		fprintf(stderr, "Le type de fichier n'est pas correct!");
+		exit(1);
+	}
+	/* lecture de la taile du fichier */
+	inode->taille = buf[3] + (buf[4] <<8);
 
-unsigned char *read_struct(unsigned int vol, unsigned int bloc, unsigned int size){
+	/* lecture de la table d'adressage direct */
+	for(i = 0; i < NB_BLOCS; i++){
+		inode->bloc_direct[i] = buf[4+1+i*2] + (buf[4+2+i*2]<<8);
+	}
+	i = 4+2+i*2;
+
+	/* lecture du bloc d'adressage indirect */
+	inode->bloc_indirect = buf[i+1] + (buf[i+2]<<8);
+
+	/* lecture du bloc d'adressage double indirect */
+	inode->bloc_double = buf[i+3] + (buf[i+4]<<8);
+
+	free(buf);
+}
+
+void write_inode(unsigned int inumber, struct inode_s* inode){
 	/* TODO */
-	return NULL;
+	/* write_struct(vol_courant, inumber, (char *) inode, sizeof(struct inode_s)); */
 }
 
 unsigned int create_inode(enum file_type_e type){
 	/* Initialisation de l'inode */
-	struct inode_s inode;
-	int inumber;
+	/* struct inode_s inode; */
+	/* int inumber; */
 
-	if(!mbr)
-		mbr = get_mbr();
+	/* if(!mbr) */
+	/* 	mbr = get_mbr(); */
 
-	inode.taille = 0;
-	inode.type = type;
-	inode.bloc_direct = (int *) calloc(NB_BLOCS, 1);
-	inode.bloc_indirect = 0;
-	inode.bloc_double = 0;
+	/* inode.taille = 0; */
+	/* inode.type = type; */
+	/* inode.bloc_direct = (int *) calloc(NB_BLOCS, 1); */
+	/* inode.bloc_indirect = 0; */
+	/* inode.bloc_double = 0; */
 
-	inumber = new_bloc();
-	write_inode(inumber, &inode);
-	return inumber;
+	/* inumber = new_bloc(); */
+	/* write_inode(inumber, &inode); */
+	/* return inumber; */
+	return 1;
 }
 
 int delete_inode(unsigned inumber){
-	int i, j;
-	struct inode_s *inode;
-	/* TODO A revoir, problème de type (unsigned int requis) */
-	unsigned char* buffer_direct = (unsigned char *)malloc(HDA_SECTORSIZE);
-	unsigned char* buffer_indirect = (unsigned char *)malloc(HDA_SECTORSIZE);
-	unsigned char* tmp = (unsigned char *)malloc(HDA_SECTORSIZE);
-
-	inode = (struct inode_s*) buffer_direct;
-
-	/* Suppression des blocs en référencement direct */
-	for(i = 0 ; i < NB_BLOCS ; i++)
-		{
-			if(inode->bloc_direct[i] == 0)
-				return 0;
-			free_bloc(inode->bloc_direct[i]);
-		}
-
-	/* Suppression des blocs en référencement indirect */
-	buffer_direct = read_struct(vol_courant, inode->bloc_indirect,
-	                            sizeof(int *));
-	for(i = 0 ; i < NB_BLOCS ; i++)
-		{
-			if(buffer_indirect[i] == 0)
-				return 0;
-			free_bloc(buffer_direct[i]);
-		}
-
-	/* Suppression des blocs en double référencement indirect */
-	buffer_indirect = read_struct(vol_courant, inode->bloc_double,
-	                              sizeof(int *));
-	for(i = 0 ; i < NB_BLOCS ; i++)
-		{
-			tmp = read_struct(vol_courant, buffer_indirect[i], sizeof(int *));
-			for(j = 0 ; j < NB_BLOCS ; j++)
-				{
-					if(tmp[i] == 0)
-						return 0;
-					free_bloc(tmp[i]);
-				}
-		}
-
-	/* Suppression de l'inode */
-	free_bloc(inumber);
-	return 0;
+	unsigned char *buf = calloc(HDA_SECTORSIZE, sizeof(unsigned char));
 }
 
 unsigned int allocate(int bloc, bool_t do_allocate){
-	if(bloc == 0)
-		if(do_allocate)
-		{
+	if(bloc == 0){
+		if(do_allocate){
 			bloc = new_bloc();
 			return bloc;
 		}
-		else
+		else{
 			return 0;
-	else
+		}
+	}
+	else{
 		return bloc;
+	}
 }
 
 /**
@@ -354,18 +349,16 @@ unsigned int vbloc_of_fbloc(unsigned int inumber, unsigned int fbloc,
 		return 0;
 
 	/* Si le fbloc-ième est référencé directement */
-	if(fbloc < NB_BLOCS)
-		{
+	if(fbloc < NB_BLOCS){
 			bloc = inode.bloc_direct[fbloc];
 			bloc = allocate(bloc, do_allocate);
 			inode.bloc_direct[fbloc] = bloc;
 			write_inode(inumber, &inode);
 			return bloc;
-		}
-
+	}
 	/* Si le fbloc-ième est référencé indirectement */
-	else if(fbloc < 2 * NB_BLOCS)
-		{
+	else{
+		if(fbloc < 2 * NB_BLOCS){
 			buffer = (int *)malloc(HDA_SECTORSIZE);
 			read_bloc(vol_courant, inode.bloc_indirect, (unsigned char*)buffer);
 			bloc = buffer[fbloc - NB_BLOCS];
@@ -375,6 +368,8 @@ unsigned int vbloc_of_fbloc(unsigned int inumber, unsigned int fbloc,
 			           (unsigned char*)buffer);
 			return bloc;
 		}
+	}
+
 	/* Si le fbloc-ième est doublement référencé indirectement */
 
 	return 0;
