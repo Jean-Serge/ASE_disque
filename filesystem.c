@@ -301,13 +301,13 @@ void write_inode(unsigned int inumber, struct inode_s* inode){
 	buf[2] = inode->type;
 
 	/* écriture de la taile du fichier */
-	buf[3] = inode->taile >> 8;
+	buf[3] = inode->taille >> 8;
 	buf[4] = inode->taille & 0xF;
 
 	/* écriture de la table d'adressage direct */
 	for(i = 0; i < NB_BLOCS; i++){
-		buf[4+1+i*2] = inode->bloc_direct >> 8;
-		buf[4+2+i*2] = inode->bloc_direct & 0xF;
+		buf[4+1+i*2] = inode->bloc_direct[i] >> 8;
+		buf[4+2+i*2] = inode->bloc_direct[i] & 0xF;
 	}
 	i = 4+2+i*2;
 
@@ -317,7 +317,7 @@ void write_inode(unsigned int inumber, struct inode_s* inode){
 
 	/* écriture du bloc d'adressage double indirect */
 	buf[i+3] = inode->bloc_double >> 8;
-	buf[i+4] = inode->bloc_double 0xF;
+	buf[i+4] = inode->bloc_double & 0xF;
 
 	write_bloc(vol_courant, inumber, buf);
 	free(buf);
@@ -325,22 +325,24 @@ void write_inode(unsigned int inumber, struct inode_s* inode){
 
 unsigned int create_inode(enum file_type_e type){
 	/* Initialisation de l'inode */
-	/* struct inode_s inode; */
-	/* int inumber; */
+	struct inode_s inode;
+	int i;
+	int inumber;
 
-	/* if(!mbr) */
-	/* 	mbr = get_mbr(); */
+	if(!mbr)
+		mbr = get_mbr();
 
-	/* inode.taille = 0; */
-	/* inode.type = type; */
-	/* inode.bloc_direct = (int *) calloc(NB_BLOCS, 1); */
-	/* inode.bloc_indirect = 0; */
-	/* inode.bloc_double = 0; */
+	inode.taille = 0;
+	inode.type = type;
+	for(i = 0; i < NB_BLOCS; i++){
+		inode.bloc_direct[i] = NULL_BLOC;
+	}
+	inode.bloc_indirect = NULL_BLOC;
+	inode.bloc_double = NULL_BLOC;
 
-	/* inumber = new_bloc(); */
-	/* write_inode(inumber, &inode); */
-	/* return inumber; */
-	return 1;
+	inumber = new_bloc();
+	write_inode(inumber, &inode);
+	return inumber;
 }
 
 int delete_inode(unsigned inumber){
