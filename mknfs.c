@@ -45,5 +45,6 @@ int main(){
 
 	printf("Initilisation du système de fichier numéro %d.\n", crt_vol);
 	init_super(crt_vol);
+	save_super();
 	return 0;
 }
