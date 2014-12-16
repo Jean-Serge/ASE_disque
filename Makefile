@@ -19,7 +19,7 @@ OBJECTS= $(addsuffix .o,\
 	  mkhd)
 
 #all: $(BINARIES) $(OBJECTS)
-all: create-disk dmps frmt drive volume filesystem dvol print_mbr mkvol mknfs
+all: create-disk dmps frmt drive volume filesystem dvol print_mbr mkvol mknfs rvol
 
 ###------------------------------
 ### Main rules
@@ -56,6 +56,9 @@ mknfs: volume drive filesystem mknfs.c
 
 print_mbr: volume drive print_mbr.c
 	$(CC) $(CFLAGS) -o print_mbr${SUFFIX} drive.o volume.o print_mbr.c ${LIBS}
+
+rvol: volume drive rvol.c
+	$(CC) $(CFLAGS) -o rvol${SUFFIX} drive.o volume.o rvol.c ${LIBS}
 
 test_convert_blc: volume drive test/test_convert_blc.c
 	$(CC) $(CFLAGS) -o test_convert_blc${SUFFIX} drive.o volume.o test/test_convert_blc.c ${LIBS}
