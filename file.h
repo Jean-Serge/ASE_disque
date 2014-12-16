@@ -3,6 +3,10 @@
 
 #include "filesystem.h"
 #include "volume.h"
+#include <stdio.h>
+#include <stdlib.h>
+
+#define READ_EOF -1
 
 /*
   Crée un fichier de type type et retourne sont inœud.
@@ -17,7 +21,7 @@ extern int delete_ifile(unsigned int inumber);
 
 enum modified_e {YES, NO};
 
-struct file_desc_t{
+struct file_desc_s{
 	unsigned int inoeud;
 	unsigned int cursor;
 	unsigned int size;
@@ -25,14 +29,16 @@ struct file_desc_t{
 	enum modified_e modified;
 };
 
+typedef struct file_desc_s file_desc_t;
 
-/* extern void close_ifile(file_desc_t *fd); */
-/* extern void flush_ifile(file_desc_t *fd); */
-/* extern void seek_ifile(file_desc_t *fd, int r_offset);  /\* relatif *\/ */
-/* extern void seek2_ifile(file_desc_t *fd, int a_offset); /\* absolu *\/ */
 
-/* extern int readc_ifile(file_desc_t *fd); */
-/* extern int writec_ifile(file_desc_t *fd, char c); */
+extern void close_ifile(file_desc_t *fd);
+extern void flush_ifile(file_desc_t *fd);
+extern void seek_ifile(file_desc_t *fd, int r_offset);  /* relatif */
+extern void seek2_ifile(file_desc_t *fd, int a_offset); /* absolu */
+
+extern int readc_ifile(file_desc_t *fd);
+extern int writec_ifile(file_desc_t *fd, char c);
 /* extern int read_ifile(file_desc_t *fd, void *buf, unsigned int nbyte); */
 /* extern int write_ifile(file_desc_t *fd, const void *buf, unsigned int nbyte); */
 
