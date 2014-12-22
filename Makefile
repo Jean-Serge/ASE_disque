@@ -66,10 +66,10 @@ tconvert_blc: volume drive ${SRCDIR}test_convert_blc.c
 	$(CC) $(CFLAGS) -o test_convert_blc${SUFFIX} drive.o volume.o ${SRCDIR}test_convert_blc.c ${LIBS}
 
 tfile: file drive volume filesystem volume ${SRCDIR}t_file.c
-	$(CC) $(CFLAGS) -o tfile drive.o volume.o  filesystem.o file.o ${SRCDIR}t_file.c ${LIBS}
+	$(CC) $(CFLAGS) -o tfile${SUFFIX} drive.o volume.o  filesystem.o file.o ${SRCDIR}t_file.c ${LIBS}
 
 tfilesystem: filesystem volume drive ${SRCDIR}test_filesystem.c
-	$(CC) $(CFLAGS) -o tfs drive.o volume.o  filesystem.o ${SRCDIR}test_filesystem.c ${LIBS}
+	$(CC) $(CFLAGS) -o tfs${SUFFIX} drive.o volume.o  filesystem.o ${SRCDIR}test_filesystem.c ${LIBS}
 
 ###------------------------------
 ### Misc.

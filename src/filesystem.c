@@ -47,6 +47,10 @@ struct free_bloc_s *read_free_bloc(unsigned int vol, unsigned int bloc){
 	return free_blc;
 }
 
+
+/************************** Gestion des superblocs ****************************/
+static struct superbloc_s *super_courant = NULL;
+
 /**
    Écrit la structure superbloc_s sur le bloc 0 du volume vol.
  */
@@ -88,42 +92,39 @@ void write_super_bloc(unsigned int vol, struct superbloc_s *super_blc){
    Retourne le super bloc du volume passé en paramêtre.
    Stoppe l'éxécution du programme si le magic n'est pas correct.
  */
-/* TESTER */
 struct superbloc_s *read_super_bloc(unsigned int vol){
-	struct superbloc_s *super;
 	char *buf;
+	struct superbloc_s *super;
 	buf = (char *)malloc(sizeof(char) * HDA_SECTORSIZE);
 	read_bloc(vol, 0, (unsigned char *)buf);
 
 	super = (struct superbloc_s *)malloc(sizeof(struct superbloc_s));
 	/* lecture du magic */
-	super->magic = buf[0] + (buf[1] <<8);
+	super->magic = ((buf[0] & 0xFF)<<8) + (buf[1] & 0xFF);
 	assert(super->magic == SUPER_MAGIC);
 
 	/* lecture du numéro de série */
-	super->serial = buf[2] + (buf[3] << 8) + (buf[4] << 16) + (buf[5] << 24);
+	super->serial = (buf[2] << 24) + (buf[3] << 16) + (buf[4] << 8)
+		+ (buf[5] & 0xFF);
 
 	/* lecture de l'adresse du prochain inœud */
-	super->inode = buf[6] + (buf[7] <<8);
+	super->inode =  + (buf[6] <<8) + (buf[7] & 0xFF);
 
 	/* lecture du nombre de bloc libre */
-	super->nb_free_blc = buf[8] + (buf[9] <<8);
+	super->nb_free_blc = (buf[8] <<8) + (buf[9] & 0xFF);
 
 	/* lecture de l'adresse du premier bloc libre */
-	super->first_free = buf[10] + (buf[11] <<8);
+	super->first_free = (buf[10] <<8) + (buf[11] & 0xFF);
 
 	/* lecture du nom du volume */
+	super->name = (char *)calloc(SUPER_SZ_NAME, sizeof(char));
 	super->name = strncpy(super->name, buf+12, SUPER_SZ_NAME);
 	return super;
 }
 
-/************************** Gestion des superblocs ****************************/
-static struct superbloc_s *super_courant = NULL;
-
 /**
    Initialise le superbloc du volume vol.
  */
-/* TESTER */
 void init_super(unsigned int vol){
 	/* struct superbloc_s *super; */
 	struct volume_s volume;
@@ -161,9 +162,13 @@ void init_super(unsigned int vol){
 }
 
 void print_super(){
+	if(!super_courant){
+		fprintf(stderr, "Le superbloc du volume n'est pas initialisé. Avait vu chargé un superbloc?\n");
+		return;
+	}
 	printf("Super courant :\n");
-	printf("magic        : %d\n", super_courant->magic);
-	printf("serial       : %d\n", super_courant->serial);
+	printf("magic        : %x\n", super_courant->magic);
+	printf("serial       : %x\n", super_courant->serial);
 	printf("inode        : %d\n", super_courant->inode);
 	printf("nb_free_bloc : %d\n", super_courant->nb_free_blc);
 	printf("first_free   : %d\n", super_courant->first_free);
