@@ -1,5 +1,5 @@
-#include "../filesystem.h"
-#include "../drive.h"
+#include "filesystem.h"
+#include "drive.h"
 #include <stdlib.h>
 
 int main(){

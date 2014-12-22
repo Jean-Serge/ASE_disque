@@ -3,7 +3,6 @@
 
 ROOTDIR=.
 SRCDIR=src/
-TSTDIR=test/
 
 CC	= gcc
 CFLAGS	= -Wall -ansi # -pedantic
@@ -63,14 +62,14 @@ print_mbr: volume drive ${SRCDIR}print_mbr.c
 rvol: volume drive ${SRCDIR}rvol.c
 	$(CC) $(CFLAGS) -o rvol${SUFFIX} drive.o volume.o ${SRCDIR}rvol.c ${LIBS}
 
-test_convert_blc: volume drive ${TSTDIR}test_convert_blc.c
-	$(CC) $(CFLAGS) -o test_convert_blc${SUFFIX} drive.o volume.o test/test_convert_blc.c ${LIBS}
+tconvert_blc: volume drive ${SRCDIR}test_convert_blc.c
+	$(CC) $(CFLAGS) -o test_convert_blc${SUFFIX} drive.o volume.o ${SRCDIR}test_convert_blc.c ${LIBS}
 
-tfile: file drive volume filesystem volume ${TSTDIR}t_file.c
-	$(CC) $(CFLAGS) -o tfile drive.o volume.o  filesystem.o file.o ${TSTDIR}t_file.c ${LIBS}
+tfile: file drive volume filesystem volume ${SRCDIR}t_file.c
+	$(CC) $(CFLAGS) -o tfile drive.o volume.o  filesystem.o file.o ${SRCDIR}t_file.c ${LIBS}
 
-tfilesystem: filesystem volume drive ${TSTDIR}test_filesystem.c
-	$(CC) $(CFLAGS) -o tfs drive.o volume.o  filesystem.o ${TSTDIR}test_filesystem.c ${LIBS}
+tfilesystem: filesystem volume drive ${SRCDIR}test_filesystem.c
+	$(CC) $(CFLAGS) -o tfs drive.o volume.o  filesystem.o ${SRCDIR}test_filesystem.c ${LIBS}
 
 ###------------------------------
 ### Misc.
