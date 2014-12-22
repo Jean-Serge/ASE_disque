@@ -2,6 +2,8 @@
 ##############################################################################
 
 ROOTDIR=.
+SRCDIR=src/
+TSTDIR=test/
 
 CC	= gcc
 CFLAGS	= -Wall -ansi # -pedantic
@@ -14,7 +16,8 @@ SUFFIX  = .bin
 ###------------------------------
 ### Main targets
 ###------------------------------------------------------------
-BINARIES= create-disk${SUFFIX} dmps${SUFFIX} dvol${SUFFIX} frmt${SUFFIX} mkvol${SUFFIX} print_mbr${SUFFIX} mknfs${SUFFIX}
+BINARIES= create-disk${SUFFIX} dmps${SUFFIX} dvol${SUFFIX} frmt${SUFFIX} mkvol${SUFFIX} print_mbr${SUFFIX} mknfs${SUFFIX}\
+rvol${SUFFIX}
 OBJECTS= $(addsuffix .o,\
 	  mkhd)
 
@@ -24,48 +27,50 @@ all: create-disk dmps frmt drive volume filesystem dvol print_mbr mkvol mknfs rv
 ###------------------------------
 ### Main rules
 ###------------------------------------------------------------
-create-disk: drive create_disk.c
-	$(CC) $(CFLAGS) -o create-disk${SUFFIX} drive.o create_disk.c ${LIBS}
+create-disk: drive ${SRCDIR}create_disk.c
+	$(CC) $(CFLAGS) -o create-disk${SUFFIX} drive.o ${SRCDIR}create_disk.c ${LIBS}
 
-dmps: drive dmps.c
-	$(CC) $(CFLAGS) -o dmps${SUFFIX} drive.o dmps.c ${LIBS}
+dmps: drive volume ${SRCDIR}dmps.c
+	$(CC) $(CFLAGS) -o dmps${SUFFIX} drive.o ${SRCDIR}dmps.c ${LIBS}
 
-frmt: drive volume.o frmt.c
-	$(CC) $(CFLAGS) -o frmt${SUFFIX} drive.o volume.o frmt.c ${LIBS}
+frmt: drive volume.o ${SRCDIR}frmt.c
+	$(CC) $(CFLAGS) -o frmt${SUFFIX} drive.o volume.o ${SRCDIR}frmt.c ${LIBS}
 
-drive: drive.c drive.h
-	$(CC) $(CFLAGS) -o drive.o -c drive.c ${INCDIR}
+drive: ${SRCDIR}drive.c ${SRCDIR}drive.h
+	$(CC) $(CFLAGS) -o drive.o -c ${SRCDIR}drive.c ${INCDIR}
 
-volume: volume.c volume.h
-	$(CC) $(CFLAGS) -o volume.o -c volume.c ${INCDIR}
+volume: ${SRCDIR}volume.c ${SRCDIR}volume.h
+	$(CC) $(CFLAGS) -o volume.o -c ${SRCDIR}volume.c ${INCDIR}
 
-filesystem: filesystem.c filesystem.h
-	$(CC) $(CFLAGS) -o filesystem.o -c filesystem.c ${INCDIR}
+filesystem: volume ${SRCDIR}filesystem.c ${SRCDIR}filesystem.h
+	$(CC) $(CFLAGS) -o filesystem.o -c ${SRCDIR}filesystem.c ${INCDIR}
 
-file: filesystem file.c file.h
-	$(CC) $(CFLAGS) -o file.o -c file.c ${INCDIR}
+file: filesystem ${SRCDIR}file.c ${SRCDIR}file.h
+	$(CC) $(CFLAGS) -o file.o -c ${SRCDIR}file.c ${INCDIR}
 
-dvol: volume drive dvol.c
-	$(CC) $(CFLAGS) -o dvol${SUFFIX} drive.o volume.o dvol.c ${LIBS}
+dvol: volume drive ${SRCDIR}dvol.c
+	$(CC) $(CFLAGS) -o dvol${SUFFIX} drive.o volume.o ${SRCDIR}dvol.c ${LIBS}
 
-mkvol: volume drive mkvol.c
-	$(CC) $(CFLAGS) -o mkvol${SUFFIX} drive.o volume.o mkvol.c ${LIBS}
+mkvol: volume drive ${SRCDIR}mkvol.c
+	$(CC) $(CFLAGS) -o mkvol${SUFFIX} drive.o volume.o ${SRCDIR}mkvol.c ${LIBS}
 
-mknfs: volume drive filesystem mknfs.c
-	$(CC) $(CFLAGS) -o mknfs${SUFFIX} drive.o volume.o filesystem.o mknfs.c ${LIBS}
+mknfs: volume drive filesystem ${SRCDIR}mknfs.c
+	$(CC) $(CFLAGS) -o mknfs${SUFFIX} drive.o volume.o filesystem.o ${SRCDIR}mknfs.c ${LIBS}
 
-print_mbr: volume drive print_mbr.c
-	$(CC) $(CFLAGS) -o print_mbr${SUFFIX} drive.o volume.o print_mbr.c ${LIBS}
+print_mbr: volume drive ${SRCDIR}print_mbr.c
+	$(CC) $(CFLAGS) -o print_mbr${SUFFIX} drive.o volume.o ${SRCDIR}print_mbr.c ${LIBS}
 
-rvol: volume drive rvol.c
-	$(CC) $(CFLAGS) -o rvol${SUFFIX} drive.o volume.o rvol.c ${LIBS}
+rvol: volume drive ${SRCDIR}rvol.c
+	$(CC) $(CFLAGS) -o rvol${SUFFIX} drive.o volume.o ${SRCDIR}rvol.c ${LIBS}
 
-test_convert_blc: volume drive test/test_convert_blc.c
+test_convert_blc: volume drive ${TSTDIR}test_convert_blc.c
 	$(CC) $(CFLAGS) -o test_convert_blc${SUFFIX} drive.o volume.o test/test_convert_blc.c ${LIBS}
 
-tfile: file drive volume filesystem volume t_file.c
-	$(CC) $(CFLAGS) -o tfile drive.o volume.o  filesystem.o file.o t_file.c ${LIBS}
+tfile: file drive volume filesystem volume ${TSTDIR}t_file.c
+	$(CC) $(CFLAGS) -o tfile drive.o volume.o  filesystem.o file.o ${TSTDIR}t_file.c ${LIBS}
 
+tfilesystem: filesystem volume drive ${TSTDIR}test_filesystem.c
+	$(CC) $(CFLAGS) -o tfs drive.o volume.o  filesystem.o ${TSTDIR}test_filesystem.c ${LIBS}
 
 ###------------------------------
 ### Misc.
