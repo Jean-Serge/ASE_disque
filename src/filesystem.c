@@ -195,7 +195,6 @@ int load_super(unsigned int vol){
 /**
    Enregistre le superbloc courant sur le disque.
  */
-/* TESTER */
 /* XX : Utile? */
 void save_super(){
 	if(!mbr)
