@@ -35,24 +35,24 @@ struct superbloc_s{
 	char *name;         /* 32 octets */
 };
 
-struct free_bloc_s{
-	int magic;          /* 2 octets */
-	int nb_free_blocs;  /* 2 octets */
-	int next;           /* 2 octets 0 si pas d'autre free_blc*/
-};
-
 extern void init_super(unsigned int vol);
 
 extern int load_super(unsigned int vol);
 
+extern void print_super();
+
 extern void save_super();
+
+/***************************** Gestion des blocs ******************************/
+struct free_bloc_s{
+	int magic;          /* 2o */
+	int nb_free_blocs;  /* 2o : nombre de bloc libre à la suite */
+	int next;           /* 2o : prochain free_bloc. 0 si pas d'autre free_blc*/
+};
 
 extern unsigned int new_bloc();
 
 extern void free_bloc(unsigned int bloc);
-
-extern void print_super();
-
 
 /****************************  Gestion des inodes *****************************/
 #define NB_BLOCS    10
@@ -61,7 +61,7 @@ extern void print_super();
 
 enum file_type_e {
 	NORMAL,
-	REPOSITORY,
+	DIRECTORY,
 	LINK,
 	SPECIAL
 };
@@ -87,8 +87,10 @@ extern void write_inode(unsigned int inumber, struct inode_s* inode);
 extern unsigned int create_inode(enum file_type_e type);
 
 extern int delete_inode(unsigned int inumber);
-
+/* À TESTER */
 extern unsigned int vbloc_of_fbloc(unsigned int inumber, unsigned int fbloc,
                                    bool_t do_allocate);
+
+extern void print_inode(unsigned int inumber);
 
 #endif

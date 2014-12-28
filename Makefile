@@ -16,7 +16,7 @@ SUFFIX  = .bin
 ### Main targets
 ###------------------------------------------------------------
 BINARIES= create-disk${SUFFIX} dmps${SUFFIX} dvol${SUFFIX} frmt${SUFFIX} mkvol${SUFFIX} print_mbr${SUFFIX} mknfs${SUFFIX}\
-rvol${SUFFIX}
+rvol${SUFFIX} tfs${SUFFIX}
 OBJECTS= $(addsuffix .o,\
 	  mkhd)
 

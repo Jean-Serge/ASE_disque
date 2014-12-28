@@ -1,34 +1,33 @@
 #include "filesystem.h"
 
 static struct mbr_s *mbr = NULL;
+static struct superbloc_s *super_courant = NULL;
 
-/********************* Fonction d'I/O sur les structures **********************/
+/************** Fonctions d'I/O pour les structures free_bloc_s ***************/
 /**
    Écrit la structure free_bloc_s free_blc sur le bloc bloc du volume vol.
  */
-/* TESTER */
 void write_free_bloc(unsigned int vol, unsigned int bloc,
                      struct free_bloc_s *free_blc){
 	unsigned char *buf = (unsigned char *)calloc(HDA_SECTORSIZE,
 	                                             sizeof(unsigned char));
 	/* Écriture du magic */
 	buf[0] = free_blc->magic>>8;
-	buf[1] = ((free_blc->magic<<8)>>8) & 0xFF;
+	buf[1] = (free_blc->magic) & 0xFF;
 
 	/* Écriture du nombre de bloc libre */
 	buf[2] = free_blc->nb_free_blocs >> 8;
-	buf[3] = ((free_blc->nb_free_blocs<<8)>>8) & 0xFF;
+	buf[3] = (free_blc->nb_free_blocs) & 0xFF;
 
 	/* Écriture de l'adresse de la prochaine série de bloc libre */
 	buf[4] = free_blc->next >> 8;
-	buf[5] = ((free_blc->next<<8)>>8) & 0xFF;
+	buf[5] = (free_blc->next) & 0xFF;
 	write_bloc(vol, bloc, buf);
 }
 /**
    Retourne la structure free_bloc_s du bloc bloc sur le volume vol.
    Stoppe le fonctionnement du programme si le magic n'est pas correct.
  */
-/* TESTER */
 struct free_bloc_s *read_free_bloc(unsigned int vol, unsigned int bloc){
 	struct free_bloc_s *free_blc;
 	unsigned char *buf = (unsigned char *)malloc(sizeof(char) * HDA_SECTORSIZE);
@@ -36,21 +35,19 @@ struct free_bloc_s *read_free_bloc(unsigned int vol, unsigned int bloc){
 	read_bloc(vol, bloc, buf);
 
 	/* lecture du magic */
-	free_blc->magic = buf[0] + (buf[1] <<8);
+	free_blc->magic = ((buf[0] & 0xFF ) << 8) + buf[1];
 	assert(free_blc->magic == FREE_MAGIC);
 
 	/* lecture du nombre de bloc libres */
-	free_blc->nb_free_blocs = buf[2] + (buf[3] <<8);
+	free_blc->nb_free_blocs = (buf[2] << 8) + buf[3];
 
 	/* lecture du prochain de l'adresse du prochain free_bloc_s */
-	free_blc->nb_free_blocs = buf[4] + (buf[5] <<8);
+	free_blc->next = (buf[4] <<8 ) + buf[5];
 	return free_blc;
 }
 
 
 /************************** Gestion des superblocs ****************************/
-static struct superbloc_s *super_courant = NULL;
-
 /**
    Écrit la structure superbloc_s sur le bloc 0 du volume vol.
  */
@@ -146,9 +143,9 @@ void init_super(unsigned int vol){
 	super_courant->name = (char *)malloc(sizeof(char) * SUPER_SZ_NAME);
 	super_courant->name = strncpy(super_courant->name, "no_name_volume",
 		                          SUPER_SZ_NAME);
-	/* On écrit le super dans le 1er bloc */
 	super_courant->nb_free_blc = volume.nsector-1;
-	super_courant->inode = volume.start_cyl * HDA_MAXSECTOR + volume.start_sec;
+	/* super_courant->inode = volume.start_cyl * HDA_MAXSECTOR + volume.start_sec; */
+	super_courant->inode = 0;
 	super_courant->first_free = 1;
 	write_super_bloc(vol, super_courant);
 
@@ -163,7 +160,7 @@ void init_super(unsigned int vol){
 
 void print_super(){
 	if(!super_courant){
-		fprintf(stderr, "Le superbloc du volume n'est pas initialisé. Avait vu chargé un superbloc?\n");
+		fprintf(stderr, "Le superbloc du volume n'est pas initialisé. Avait vous chargé un superbloc?\n");
 		return;
 	}
 	printf("Super courant :\n");
@@ -203,34 +200,37 @@ void save_super(){
 	write_super_bloc(vol_courant, super_courant);
 }
 
+
+/***************************** Gestion des blocs ******************************/
 /**
-   Crée un nouveau bloc sur le volume courant.
+   Retourne un nouveau bloc sur le volume courant.
    Retourne 0 si aucun bloc n'est libre.
  */
-/* TESTER */
 unsigned int new_bloc(){
-	/************/
-	/* À TESTER */
-	/************/
 	/* On récupère le 1er bloc libre du superbloc */
 	struct free_bloc_s *free_blc;
-
-	if(super_courant->nb_free_blc == 0){
-		return 0;
-	}
 
 	if(!mbr)
 		mbr = get_mbr();
 
+	if(super_courant->nb_free_blc == 0){
+		printf("Pas assez de bloc\n");
+		return 0;
+	}
+
+
 	/* Cas où le premier bloc libre est le seul de sa série */
 	free_blc = read_free_bloc(vol_courant, super_courant->first_free);
+	super_courant->nb_free_blc--;
 	if(free_blc->nb_free_blocs == 1){
 		super_courant->first_free = free_blc->next;
+		save_super();
 		return super_courant->first_free;
 	}
 	else{
-		free_blc->nb_free_blocs--;
 		super_courant->first_free++;
+		save_super();
+		write_free_bloc(vol_courant, super_courant->first_free, free_blc);
 		return super_courant->first_free-1;
 	}
 }
@@ -238,41 +238,30 @@ unsigned int new_bloc(){
 /**
    Libére le bloc passé en paramêtre.
  */
-/* TESTER */
 void free_bloc(unsigned int bloc){
-	struct free_bloc_s *first_free;
-	struct free_bloc_s *nw_first_free;
+	struct free_bloc_s nw_free;
 	if(super_courant == NULL){
-	 	super_courant = read_super_bloc(vol_courant);
+		super_courant = read_super_bloc(vol_courant);
 	}
 
-	first_free = read_free_bloc(vol_courant, super_courant->first_free);
-
-	nw_first_free = (struct free_bloc_s *)malloc(sizeof(struct free_bloc_s));
-	nw_first_free->magic = FREE_MAGIC;
-	nw_first_free->nb_free_blocs = 1;
-	nw_first_free->next = first_free->next;
-
+	nw_free.magic = FREE_MAGIC;
+	nw_free.nb_free_blocs = 1;
+	nw_free.next = super_courant->first_free;
 	super_courant->first_free = bloc;
-	write_free_bloc(vol_courant, bloc, nw_first_free);
-	super_courant->nb_free_blc--;
-	write_super_bloc(vol_courant, super_courant);
-	free(nw_first_free);
-	free(first_free);
+	super_courant->nb_free_blc++;
+	save_super();
+	write_free_bloc(vol_courant, bloc, &nw_free);
 }
 
-
 /**************************** Gestion des inodes ******************************/
-/* TESTER */
 void read_inode(unsigned int inumber, struct inode_s* inode){
 	unsigned char *buf = (unsigned char *)malloc(sizeof(char) * HDA_SECTORSIZE);
 	int tmp;
 	int i;
-	inode = (struct inode_s *)malloc(sizeof(struct inode_s));
 	read_bloc(vol_courant, inumber, buf);
 
 	/* lecture du magic */
-	inode->magic = buf[0] + (buf[1] <<8);
+	inode->magic = ((buf[0] & 0xFF)<<8) + buf[1];
 	assert(inode->magic == INODE_MAGIC);
 
 	/* lecture du type du fichier */
@@ -281,8 +270,8 @@ void read_inode(unsigned int inumber, struct inode_s* inode){
 	case NORMAL:
 		inode->type = NORMAL;
 		break;
-	case REPOSITORY:
-		inode->type = REPOSITORY;
+	case DIRECTORY:
+		inode->type = DIRECTORY;
 		break;
 	case LINK:
 		inode->type = LINK;
@@ -295,23 +284,23 @@ void read_inode(unsigned int inumber, struct inode_s* inode){
 		exit(1);
 	}
 	/* lecture de la taile du fichier */
-	inode->taille = buf[3] + (buf[4] <<8);
+	inode->taille = ((buf[3] & 0xFF) << 8)+ buf[4];
 
 	/* lecture de la table d'adressage direct */
 	for(i = 0; i < NB_BLOCS; i++){
-		inode->bloc_direct[i] = buf[4+1+i*2] + (buf[4+2+i*2]<<8);
+		inode->bloc_direct[i] = ((buf[4+1+i*2] & 0xFF) << 8) + (buf[4+2+i*2]);
 	}
-	i = 4+2+i*2;
 
 	/* lecture du bloc d'adressage indirect */
-	inode->bloc_indirect = buf[i+1] + (buf[i+2]<<8);
+	i = 4+2+i*2;
+	inode->bloc_indirect = ((buf[i+1] & 0xFF) << 8) + (buf[i+2]);
 
 	/* lecture du bloc d'adressage double indirect */
-	inode->bloc_double = buf[i+3] + (buf[i+4]<<8);
+	inode->bloc_double = ((buf[i+3] & 0xFF) << 8) + buf[i+4];
 
 	free(buf);
 }
-/* TESTER */
+
 void write_inode(unsigned int inumber, struct inode_s* inode){
 	unsigned char *buf = (unsigned char *)calloc(HDA_SECTORSIZE,
                                                  sizeof(unsigned char));
@@ -319,35 +308,34 @@ void write_inode(unsigned int inumber, struct inode_s* inode){
 
 	/* écriture du magic */
 	buf[0] = inode->magic >> 8;
-	buf[1] = inode->magic & 0xF;
+	buf[1] = inode->magic & 0xFF;
 
 	/* écriture du type du fichier */
 	buf[2] = inode->type;
 
 	/* écriture de la taile du fichier */
 	buf[3] = inode->taille >> 8;
-	buf[4] = inode->taille & 0xF;
+	buf[4] = inode->taille & 0xFF;
 
 	/* écriture de la table d'adressage direct */
 	for(i = 0; i < NB_BLOCS; i++){
-		buf[4+1+i*2] = inode->bloc_direct[i] >> 8;
-		buf[4+2+i*2] = inode->bloc_direct[i] & 0xF;
+		buf[4+1+i*2] = (inode->bloc_direct[i] >> 8) & 0xFF;
+		buf[4+2+i*2] = inode->bloc_direct[i] & 0xFF;
 	}
 	i = 4+2+i*2;
 
 	/* écriture du bloc d'adressage indirect */
 	buf[i+1] = inode->bloc_indirect >> 8;
-	buf[i+2] = inode->bloc_indirect & 0xF;
+	buf[i+2] = inode->bloc_indirect & 0xFF;
 
 	/* écriture du bloc d'adressage double indirect */
 	buf[i+3] = inode->bloc_double >> 8;
-	buf[i+4] = inode->bloc_double & 0xF;
+	buf[i+4] = inode->bloc_double & 0xFF;
 
 	write_bloc(vol_courant, inumber, buf);
 	free(buf);
 }
 
-/* TESTER */
 unsigned int create_inode(enum file_type_e type){
 	/* Initialisation de l'inode */
 	struct inode_s inode;
@@ -357,6 +345,7 @@ unsigned int create_inode(enum file_type_e type){
 	if(!mbr)
 		mbr = get_mbr();
 
+	inode.magic = INODE_MAGIC;
 	inode.taille = 0;
 	inode.type = type;
 	for(i = 0; i < NB_BLOCS; i++){
@@ -366,8 +355,41 @@ unsigned int create_inode(enum file_type_e type){
 	inode.bloc_double = NULL_BLOC;
 
 	inumber = new_bloc();
+	printf("inumber : %d\n", inumber);
 	write_inode(inumber, &inode);
 	return inumber;
+}
+
+extern void print_inode(unsigned int inumber){
+	struct inode_s inode;
+	int i;
+	read_inode(inumber, &inode);
+	printf("inode %d :\ntype                      : ", inumber);
+	switch(inode.type){
+	case NORMAL:
+		printf("NORMAL");
+		break;
+	case DIRECTORY:
+		printf("DIRECTORY");
+		break;
+	case LINK:
+		printf("LINK");
+		break;
+	case SPECIAL:
+		printf("SPECIAL");
+		break;
+	default:
+		printf("ERREUR");
+	}
+	printf("\ntaille                    : %d\n", inode.taille);
+	printf("Bloc                        : {");
+	for(i = 0; i < NB_BLOCS; i++){
+		printf("%d", inode.bloc_direct[i]);
+		if(i != NB_BLOCS -1)
+			printf(" ,");
+	}
+	printf("}\nbloc d'indirection simple : %d\n", inode.bloc_indirect);
+	printf("bloc d'indirection double : %d\n", inode.bloc_double);
 }
 
 /* TESTER */
@@ -375,19 +397,19 @@ void free_bloc_array(unsigned char *buffer){
 	int i;
 	int bloc;
 	for(i = 0; i < NB_BLOCS; i += 2){
-		bloc = (buffer[i] << 8) + buffer[i+1];
+		bloc = ((buffer[i] & 0xFF) << 8) + buffer[i+1];
 		if(bloc != NULL_BLOC){
 			free_bloc((buffer[i] << 8) + buffer[i+1]);
 		}
 	}
 }
 
-/* TESTER */
-int delete_inode(unsigned inumber){
+int delete_inode(unsigned int inumber){
 	int i, bloc;
-	struct inode_s *inode = NULL;
+	struct inode_s *inode;
 	unsigned char *indirect_lvl1 = NULL;
 	unsigned char *indirect_lvl2 = NULL;
+	inode = (struct inode_s *)malloc(sizeof(struct inode_s));
 	read_inode(inumber, inode);
 
 	/* Suppression des blocs en référencement direct */
@@ -440,16 +462,23 @@ unsigned int allocate(int bloc){
  * Sinon si do_allocate est vrai un nouveau bloc est alloué et retourné
  * Sinon retourne 0.
  */
-/* TESTER */
 unsigned int vbloc_of_fbloc(unsigned int inumber, unsigned int fbloc,
                             bool_t do_allocate){
 	struct inode_s inode;
-	fbloc--; /* Pour travailler sur les indices directement. */
+	fbloc--;                  /* Pour travailler sur les indices directement. */
 	read_inode(inumber, &inode);
 
-	/* Si fbloc est négatif et qu'il atteint un bloc inategnable */
-	if(fbloc == 0 || fbloc >= inode.taille)
+	if(!super_courant){
+		fprintf(stderr, "Super bloc non initialisé. Avait vous mounté un volume?\n");
+		exit(1);
+	}
+
+	printf("****%d\n", fbloc);
+	/* Si fbloc est négatif */
+	if(fbloc < 0){
+		printf("Bloc négatif\n");fflush(stdout);
 		return NULL_BLOC;
+	}
 
 	/* Si le fbloc-ième est référencé directement */
 	if(fbloc < NB_BLOCS){
