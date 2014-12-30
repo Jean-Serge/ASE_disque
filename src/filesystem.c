@@ -122,8 +122,7 @@ struct superbloc_s *read_super_bloc(unsigned int vol){
 /**
    Initialise le superbloc du volume vol.
  */
-void init_super(unsigned int vol){
-	/* struct superbloc_s *super; */
+void init_super(unsigned int vol, char *name){
 	struct volume_s volume;
 	struct free_bloc_s *free_blc;
 
@@ -141,14 +140,17 @@ void init_super(unsigned int vol){
 	   je prend le n° du volume */
 	super_courant->serial = 0x00112233;
 	super_courant->name = (char *)malloc(sizeof(char) * SUPER_SZ_NAME);
-	super_courant->name = strncpy(super_courant->name, "no_name_volume",
-		                          SUPER_SZ_NAME);
+	if(name == NULL){
+		super_courant->name = strncpy(super_courant->name, "no_name_volume",
+		                              SUPER_SZ_NAME);
+	}
+	else{
+		strncpy(super_courant->name, name, SUPER_SZ_NAME);
+	}
 	super_courant->nb_free_blc = volume.nsector-1;
-	/* super_courant->inode = volume.start_cyl * HDA_MAXSECTOR + volume.start_sec; */
-	super_courant->inode = 0;
 	super_courant->first_free = 1;
+	super_courant->inode = 0;
 	write_super_bloc(vol, super_courant);
-
 
 	free_blc = (struct free_bloc_s *)malloc(sizeof(struct free_bloc_s));
 	free_blc->magic = FREE_MAGIC;

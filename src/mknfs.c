@@ -1,4 +1,5 @@
 #include <stdlib.h>
+#include <string.h>
 #include "drive.h"
 #include "volume.h"
 #include "filesystem.h"
@@ -12,9 +13,10 @@
 #define ERR_NOT_VOL   3
 #define ERR_INCRT_VOL 4
 
-int main(){
+int main(int argc, char *argv[]){
 	char *endptr;
 	char *env_value;
+	char name[SUPER_SZ_NAME];
 	int crt_vol;
 	struct mbr_s *mbr;
 	env_value = getenv(ENV_VAR_NAME);
@@ -35,6 +37,10 @@ int main(){
 		return ERR_INCRT_VOL;
 	}
 
+	if(argc == 2){
+		strncpy(name, argv[1], SUPER_SZ_NAME);
+	}
+
 	mkhd();
 
 	mbr = get_mbr();
@@ -43,7 +49,13 @@ int main(){
 		return ERR_INCRT_VOL;
 	}
 
-	printf("Initilisation du système de fichier numéro %d.\n", crt_vol);
-	init_super(crt_vol);
+	printf("Initilisation du système de fichier numéro %d", crt_vol);
+	if(argc == 2){
+		printf(" avec comme nom de volume: \"%s\".\n", name);
+		init_super(crt_vol, name);
+		return 0;
+	}
+	printf(".\n");
+	init_super(crt_vol, NULL);
 	return 0;
 }

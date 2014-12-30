@@ -35,7 +35,7 @@ struct superbloc_s{
 	char *name;         /* 32 octets */
 };
 
-extern void init_super(unsigned int vol);
+extern void init_super(unsigned int vol, char *name);
 
 extern int load_super(unsigned int vol);
 
