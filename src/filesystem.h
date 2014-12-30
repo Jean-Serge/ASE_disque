@@ -67,8 +67,8 @@ enum file_type_e {
 };
 
 typedef enum {
-	FALSE,
-	TRUE
+	FALSE = 0,
+	TRUE  = 1
 } bool_t;
 
 struct inode_s{

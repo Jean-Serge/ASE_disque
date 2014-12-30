@@ -202,6 +202,13 @@ void save_super(){
 
 
 /***************************** Gestion des blocs ******************************/
+
+void clean_bloc(unsigned int bloc){
+	unsigned char *buf = (unsigned char*)calloc(sizeof(char), HDA_SECTORSIZE);
+	write_bloc(vol_courant, bloc, buf);
+	free(buf);
+}
+
 /**
    Retourne un nouveau bloc sur le volume courant.
    Retourne 0 si aucun bloc n'est libre.
@@ -214,7 +221,7 @@ unsigned int new_bloc(){
 		mbr = get_mbr();
 
 	if(super_courant->nb_free_blc == 0){
-		printf("Pas assez de bloc\n");
+		fprintf(stderr, "Pas assez de bloc\n");
 		return 0;
 	}
 
@@ -250,8 +257,10 @@ void free_bloc(unsigned int bloc){
 	super_courant->first_free = bloc;
 	super_courant->nb_free_blc++;
 	save_super();
+	clean_bloc(bloc);
 	write_free_bloc(vol_courant, bloc, &nw_free);
 }
+
 
 /**************************** Gestion des inodes ******************************/
 void read_inode(unsigned int inumber, struct inode_s* inode){
@@ -355,7 +364,7 @@ unsigned int create_inode(enum file_type_e type){
 	inode.bloc_double = NULL_BLOC;
 
 	inumber = new_bloc();
-	printf("inumber : %d\n", inumber);
+
 	write_inode(inumber, &inode);
 	return inumber;
 }
@@ -364,7 +373,8 @@ extern void print_inode(unsigned int inumber){
 	struct inode_s inode;
 	int i;
 	read_inode(inumber, &inode);
-	printf("inode %d :\ntype                      : ", inumber);
+	printf("Information sur l'inode %d :\n", inumber);
+	printf("\tType                      : ");
 	switch(inode.type){
 	case NORMAL:
 		printf("NORMAL");
@@ -381,15 +391,15 @@ extern void print_inode(unsigned int inumber){
 	default:
 		printf("ERREUR");
 	}
-	printf("\ntaille                    : %d\n", inode.taille);
-	printf("Bloc                        : {");
+	printf("\n\tTaille                    : %d\n", inode.taille);
+	printf("\tBloc direct               : {");
 	for(i = 0; i < NB_BLOCS; i++){
 		printf("%d", inode.bloc_direct[i]);
 		if(i != NB_BLOCS -1)
 			printf(" ,");
 	}
-	printf("}\nbloc d'indirection simple : %d\n", inode.bloc_indirect);
-	printf("bloc d'indirection double : %d\n", inode.bloc_double);
+	printf("}\n\tBloc d'indirection simple : %d\n", inode.bloc_indirect);
+	printf("\tBloc d'indirection double : %d\n", inode.bloc_double);
 }
 
 /* TESTER */
@@ -465,7 +475,6 @@ unsigned int allocate(int bloc){
 unsigned int vbloc_of_fbloc(unsigned int inumber, unsigned int fbloc,
                             bool_t do_allocate){
 	struct inode_s inode;
-	fbloc--;                  /* Pour travailler sur les indices directement. */
 	read_inode(inumber, &inode);
 
 	if(!super_courant){
@@ -473,18 +482,15 @@ unsigned int vbloc_of_fbloc(unsigned int inumber, unsigned int fbloc,
 		exit(1);
 	}
 
-	printf("****%d\n", fbloc);
-	/* Si fbloc est négatif */
-	if(fbloc < 0){
-		printf("Bloc négatif\n");fflush(stdout);
-		return NULL_BLOC;
-	}
-
-	/* Si le fbloc-ième est référencé directement */
+	/* Si le fbloc-ième peut être référencé directement */
 	if(fbloc < NB_BLOCS){
-		if(inode.bloc_direct == NULL_BLOC){
+		if(inode.bloc_direct[fbloc] == NULL_BLOC){
 			if(do_allocate == TRUE){
 				inode.bloc_direct[fbloc] = new_bloc();
+
+				/* Mise à kout de la taille de l'inode */
+				if(inode.taille <= fbloc)
+					inode.taille = fbloc+1;
 				write_inode(inumber, &inode);
 			}
 			else{
@@ -494,42 +500,50 @@ unsigned int vbloc_of_fbloc(unsigned int inumber, unsigned int fbloc,
 		return inode.bloc_direct[fbloc];
 	}
 
-	/* Si le fbloc-ième est référencé indirectement */
+
+
+	/* Si le fbloc-ième peut être référencé indirectement */
 	if(fbloc < 2 * NB_BLOCS){
 		unsigned char *indirect = (unsigned char *)malloc(sizeof(unsigned char)
 		                                                  * HDA_SECTORSIZE);
 		int nbloc = NULL_BLOC;
-		/* La table d'indirection n'est pas initialisé */
+
+		/* Si la table d'indirection n'est pas initialisé */
 		if(inode.bloc_indirect == NULL_BLOC){
 			if(do_allocate){
 				inode.bloc_indirect = new_bloc();
+				clean_bloc(inode.bloc_indirect);
+				if(inode.taille <= fbloc)
+					inode.taille = fbloc+1;
 				write_inode(inumber, &inode);
 			}
 			else{
 				return NULL_BLOC;
 			}
 		}
+
 		read_bloc(vol_courant, inode.bloc_indirect, indirect);
 
-		/* Le bloc voulu n'est pas initialisé */
-		nbloc = (indirect[2*fbloc-NB_BLOCS-1]<<8) + indirect[2*fbloc-NB_BLOCS];
-		if(nbloc == NULL_BLOC){
+		nbloc  = indirect[(fbloc-NB_BLOCS)*2]<<8;
+		nbloc += indirect[(fbloc-NB_BLOCS)*2+1];
+		if(nbloc == NULL_BLOC){         /* Le bloc voulu n'est pas initialisé */
 			if(do_allocate){
-				int nw_bloc = new_bloc();
-				indirect[2*fbloc-NB_BLOCS-1] = nw_bloc >> 8;
-				indirect[2*fbloc-NB_BLOCS] = nw_bloc & 0xF;
+				nbloc = new_bloc();
+				indirect[(fbloc-NB_BLOCS)*2]   = nbloc >> 8;
+				indirect[(fbloc-NB_BLOCS)*2+1] = nbloc & 0xFF;
 				write_bloc(vol_courant, inode.bloc_indirect, indirect);
 			}
 			else{
 				return NULL_BLOC;
-			}
-			return (indirect[2*fbloc-NB_BLOCS-1]<<8)
-			       + indirect[2*fbloc-NB_BLOCS];
+			};
 		}
+		return nbloc;
 	}
+
 
 	/* Si le fbloc-ième est doublement référencé indirectement */
 	if(fbloc < (2 + NB_BLOCS) * NB_BLOCS){
+		int bloc_table1, bloc_table2;
 		int idx_lvl1,idx_lvl2;
 		unsigned char *table1 = (unsigned char *)malloc(sizeof(unsigned char) *
 		                                                HDA_SECTORSIZE);
@@ -539,12 +553,15 @@ unsigned int vbloc_of_fbloc(unsigned int inumber, unsigned int fbloc,
 		if(inode.bloc_double == NULL_BLOC){
 			if(do_allocate){
 				inode.bloc_double = new_bloc();
+				clean_bloc(inode.bloc_double);
 				write_inode(inumber, &inode);
 			}
 			else{
 				return NULL_BLOC;
 			}
 		}
+
+		bloc_table1 = inode.bloc_double;
 
 		/*************************************************/
 		/* Lecture de la table d'indirection de niveau 1 */
@@ -553,13 +570,16 @@ unsigned int vbloc_of_fbloc(unsigned int inumber, unsigned int fbloc,
 		/* la "case du tableau" à lire pour accéder au bon tableau */
 		/* d'indirection de niveau 2 */
 		idx_lvl1 = ((fbloc - NB_BLOCS) / NB_BLOCS) - 1;
-		read_bloc(vol_courant, inode.bloc_double, table1);
-		if((table1[idx_lvl1*2] << 8) + (table1[idx_lvl1*2+1]) == 0){
+		read_bloc(vol_courant, bloc_table1, table1);
+		bloc_table2 = (table1[idx_lvl1*2]>>8) + table1[idx_lvl1*2+1];
+
+		if(bloc_table2 == NULL_BLOC){
 			if(do_allocate){
 				/* On crée la table d'indirection de niveau 1 */
-				int nw_bloc = new_bloc();
-				table1[idx_lvl1*2] = nw_bloc >> 8;
-				table1[idx_lvl1*2+1] = nw_bloc & 0xF;
+				bloc_table2 = new_bloc();
+				clean_bloc(bloc_table2);
+				table1[idx_lvl1*2] = bloc_table2 >> 8;
+				table1[idx_lvl1*2+1] = bloc_table2 & 0xFF;
 				write_bloc(vol_courant, inode.bloc_double, table1);
 			}
 			else{
@@ -568,25 +588,28 @@ unsigned int vbloc_of_fbloc(unsigned int inumber, unsigned int fbloc,
 		}
 
 		/*************************************************/
-		/* Lecture de la table d'indirection de niveau 1 */
+		/* Lecture de la table d'indirection de niveau 2 */
 		/*************************************************/
 		idx_lvl2 = (fbloc - NB_BLOCS * 2) - idx_lvl1 * NB_BLOCS;
-		read_bloc(vol_courant, table1[idx_lvl1], table2);
+		read_bloc(vol_courant, bloc_table2, table2);
 
-		if(((table2[idx_lvl2] << 8) + table2[idx_lvl2]) == NULL_BLOC){
+		if((table2[idx_lvl2] << 8) + table2[idx_lvl2] == NULL_BLOC){
 			if(do_allocate){
 				/* On crée la table de niveau 2 */
-				int nw_bloc = new_bloc();
-				int blc = (table1[idx_lvl1*2] << 8) + table1[idx_lvl1*2+1];
-				table2[idx_lvl2*2] = nw_bloc >> 8;
-				table2[idx_lvl2*2+1] = nw_bloc & 0xF;
-				write_bloc(vol_courant, blc, table2);
+				int bloc_final = new_bloc();
+				clean_bloc(bloc_final);
+				if(inode.taille <= fbloc)
+					inode.taille = fbloc+1;
+				write_inode(inumber, &inode);
+				table2[idx_lvl2*2] = bloc_final >> 8;
+				table2[idx_lvl2*2+1] = bloc_final & 0xFF;
+				write_bloc(vol_courant, bloc_table2, table2);
 			}
 			else{
 				return NULL_BLOC;
 			}
 		}
-		return (table1[idx_lvl1*2] << 8) + table1[idx_lvl1*2+1];
+		return (table2[idx_lvl2*2] << 8) + table2[idx_lvl2*2+1];
 	}
 	return NULL_BLOC;
 }
