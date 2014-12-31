@@ -16,12 +16,12 @@ SUFFIX  = .bin
 ### Main targets
 ###------------------------------------------------------------
 BINARIES= create-disk${SUFFIX} dmps${SUFFIX} dvol${SUFFIX} frmt${SUFFIX} mkvol${SUFFIX} print_mbr${SUFFIX} mknfs${SUFFIX}\
-rvol${SUFFIX} tfs${SUFFIX} if_status${SUFFIX}
+rvol${SUFFIX} tfs${SUFFIX} if_status${SUFFIX} if_pfile${SUFFIX} if_cfile${SUFFIX}
 OBJECTS= $(addsuffix .o,\
 	  mkhd)
 
 #all: $(BINARIES) $(OBJECTS)
-all: create-disk dmps frmt drive volume filesystem dvol print_mbr mkvol mknfs rvol if_status
+all: create-disk dmps frmt drive volume filesystem dvol print_mbr mkvol mknfs rvol if_status if_pfile if_cfile
 
 ###------------------------------
 ### Main rules
@@ -38,7 +38,7 @@ frmt: drive volume.o ${SRCDIR}frmt.c
 drive: ${SRCDIR}drive.c ${SRCDIR}drive.h
 	$(CC) $(CFLAGS) -o drive.o -c ${SRCDIR}drive.c ${INCDIR}
 
-volume: ${SRCDIR}volume.c ${SRCDIR}volume.h
+volume: drive ${SRCDIR}volume.c ${SRCDIR}volume.h
 	$(CC) $(CFLAGS) -o volume.o -c ${SRCDIR}volume.c ${INCDIR}
 
 filesystem: volume ${SRCDIR}filesystem.c ${SRCDIR}filesystem.h
@@ -62,8 +62,14 @@ print_mbr: volume drive ${SRCDIR}print_mbr.c
 rvol: volume drive ${SRCDIR}rvol.c
 	$(CC) $(CFLAGS) -o rvol${SUFFIX} drive.o volume.o ${SRCDIR}rvol.c ${LIBS}
 
-if_status: volume drive ${SRCDIR}if_status.c
+if_status: filesystem ${SRCDIR}if_status.c
 	$(CC) $(CFLAGS) -o if_status${SUFFIX} drive.o volume.o filesystem.o ${SRCDIR}if_status.c ${LIBS}
+
+if_pfile: file ${SRCDIR}if_pfile.c
+	$(CC) $(CFLAGS) -o if_pfile${SUFFIX} drive.o volume.o filesystem.o file.o ${SRCDIR}if_pfile.c ${LIBS}
+
+if_cfile: file ${SRCDIR}if_cfile.c
+	$(CC) $(CFLAGS) -o if_cfile${SUFFIX} drive.o volume.o filesystem.o file.o ${SRCDIR}if_cfile.c ${LIBS}
 
 ###------------------------------
 ### Testing rules
