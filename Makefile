@@ -16,12 +16,12 @@ SUFFIX  = .bin
 ### Main targets
 ###------------------------------------------------------------
 BINARIES= create-disk${SUFFIX} dmps${SUFFIX} dvol${SUFFIX} frmt${SUFFIX} mkvol${SUFFIX} print_mbr${SUFFIX} mknfs${SUFFIX}\
-rvol${SUFFIX} tfs${SUFFIX}
+rvol${SUFFIX} tfs${SUFFIX} if_status${SUFFIX}
 OBJECTS= $(addsuffix .o,\
 	  mkhd)
 
 #all: $(BINARIES) $(OBJECTS)
-all: create-disk dmps frmt drive volume filesystem dvol print_mbr mkvol mknfs rvol
+all: create-disk dmps frmt drive volume filesystem dvol print_mbr mkvol mknfs rvol if_status
 
 ###------------------------------
 ### Main rules
@@ -62,6 +62,8 @@ print_mbr: volume drive ${SRCDIR}print_mbr.c
 rvol: volume drive ${SRCDIR}rvol.c
 	$(CC) $(CFLAGS) -o rvol${SUFFIX} drive.o volume.o ${SRCDIR}rvol.c ${LIBS}
 
+if_status: volume drive ${SRCDIR}if_status.c
+	$(CC) $(CFLAGS) -o if_status${SUFFIX} drive.o volume.o filesystem.o ${SRCDIR}if_status.c ${LIBS}
 
 ###------------------------------
 ### Testing rules
