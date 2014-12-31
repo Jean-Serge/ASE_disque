@@ -54,6 +54,8 @@ extern unsigned int new_bloc();
 
 extern void free_bloc(unsigned int bloc);
 
+extern void clean_bloc(unsigned int bloc);
+
 /****************************  Gestion des inodes *****************************/
 #define NB_BLOCS    10
 #define INODE_MAGIC 0xCAFE
@@ -87,7 +89,7 @@ extern void write_inode(unsigned int inumber, struct inode_s* inode);
 extern unsigned int create_inode(enum file_type_e type);
 
 extern int delete_inode(unsigned int inumber);
-/* À TESTER */
+
 extern unsigned int vbloc_of_fbloc(unsigned int inumber, unsigned int fbloc,
                                    bool_t do_allocate);
 
