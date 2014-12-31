@@ -490,10 +490,11 @@ unsigned int vbloc_of_fbloc(unsigned int inumber, unsigned int fbloc,
 			if(do_allocate == TRUE){
 				inode.bloc_direct[fbloc] = new_bloc();
 
-				/* Mise à kout de la taille de l'inode */
+				/* Mise à jour de la taille de l'inode */
 				if(inode.taille <= fbloc)
 					inode.taille = fbloc+1;
 				write_inode(inumber, &inode);
+				clean_bloc(inode.bloc_direct[fbloc]);
 			}
 			else{
 				return NULL_BLOC;
@@ -534,6 +535,7 @@ unsigned int vbloc_of_fbloc(unsigned int inumber, unsigned int fbloc,
 				indirect[(fbloc-NB_BLOCS)*2]   = nbloc >> 8;
 				indirect[(fbloc-NB_BLOCS)*2+1] = nbloc & 0xFF;
 				write_bloc(vol_courant, inode.bloc_indirect, indirect);
+				clean_bloc(nbloc);
 			}
 			else{
 				return NULL_BLOC;
@@ -606,6 +608,7 @@ unsigned int vbloc_of_fbloc(unsigned int inumber, unsigned int fbloc,
 				table2[idx_lvl2*2] = bloc_final >> 8;
 				table2[idx_lvl2*2+1] = bloc_final & 0xFF;
 				write_bloc(vol_courant, bloc_table2, table2);
+				clean_bloc(bloc_final);
 			}
 			else{
 				return NULL_BLOC;
