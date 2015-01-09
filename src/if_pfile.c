@@ -12,6 +12,7 @@
 #define ERR_INCRT_VOL     4
 #define ERR_INCRT_INUMBER 5
 #define ERR_OPT           6
+#define MAX_VOLUME        8
 
 void usage(){
 	printf("if_pfile - affichage du contenu d'un fichier sur un volume donnée.\n\n");
@@ -55,13 +56,12 @@ int read_inumber(char *inumber){
 
 int main(int argc, char *argv[]){
 	int vol = -1;
-	unsigned int inumber = 0;
+	unsigned int inumber = -1;
 	int opt;
 	extern char *optarg;
 	struct mbr_s *mbr;
 	file_desc_t fd;
 	char c;
-	printf("lol");fflush(stdout);
 
 	if(argc == 1)
 		exit(ERR_ARGT);
@@ -82,6 +82,11 @@ int main(int argc, char *argv[]){
 			fprintf(stderr, "Saisissez « if_ipfile -h » pour plus d'informations.");
 			exit(ERR_OPT);
 		}
+	}
+
+	if(vol == -1 || inumber == -1){
+		usage();
+		exit(ERR_ARGT);
 	}
 
 	mkhd();

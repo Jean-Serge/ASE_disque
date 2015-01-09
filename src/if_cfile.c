@@ -1,9 +1,5 @@
 #include <stdlib.h>
-#include <string.h>
-#include <getopt.h>
-#include "filesystem.h"
 #include "file.h"
-#include "volume.h"
 
 #define ERR_OK            0
 #define ERR_ARGT          1
@@ -14,9 +10,8 @@
 #define ERR_OPT           6
 
 void usage(){
-	printf("if_cfile - créer un fichier\n");
-	printf("if_cfile VOLUME TYPE\n ");
-	printf("Type possible :\tN -> NORMAL\n\t D -> DIRECTORY\n\t L -> LINK\n\t S -> SPECIAL.\n");
+	printf("if_cfile - copie un fichier vers un nouveau nouvellement créer\n");
+	printf("if_dfile VOLUME INUMBER\n ");
 }
 
 int read_vol(char *volume){
@@ -37,8 +32,24 @@ int read_vol(char *volume){
 	return vol;
 }
 
+int read_inumber(char *inumber){
+	char *endptr;
+	int vol = strtol(inumber, &endptr, 10);
+	if(*endptr){
+		fprintf(stderr, "Erreur :  %s n'est pas un nombre.\n", endptr);
+		exit(ERR_NOT_INT);
+	}
+	if(vol < 0){
+		fprintf(stderr, "Erreur : l'inumber est inférieur à 0.\n");
+		exit(ERR_INCRT_INUMBER);
+	}
+	return vol;
+}
+
 int main(int argc, char *argv[]){
-	int ifile, vol;
+	int inumber, vol, ifile;
+	file_desc_t src, dest;
+	char c;
 
 	if(argc != 3){
 		usage();
@@ -46,27 +57,42 @@ int main(int argc, char *argv[]){
 	}
 
 	vol = read_vol(argv[1]);
+	inumber = read_inumber(argv[2]);
+
 	mkhd();
-	load_super(0);
+	load_super(vol);
 
-	printf("Création d'un fichier de type ");
-	if(argv[2][0] == 'N'){
-		printf("NORMAL");
+	switch(get_fd_type(&src)){
+	case NORMAL:
 		ifile = create_ifile(NORMAL);
-	}
-	if(argv[2][0] == 'D'){
-		printf("DIRECTORY");
+		break;
+	case DIRECTORY:
 		ifile = create_ifile(DIRECTORY);
-	}
-	if(argv[2][0] == 'L'){
-		printf("LINK");
+		break;
+	case LINK:
 		ifile = create_ifile(LINK);
-	}
-	if(argv[2][0] == 'S'){
-		printf("SPECIAL");
+		break;
+	case SPECIAL:
 		ifile = create_ifile(SPECIAL);
+		break;
 	}
 
-	printf("Inode %d\n", ifile);
+
+
+	printf("Nouveau fichier d'inumber %d\n", ifile);
+
+	open_ifile(&src, inumber);
+	open_ifile(&dest, ifile);
+
+	while(1){
+		c = readc_ifile(&src);
+		if(c == READ_EOF)
+			break;
+		writec_ifile(&dest, c);
+	}
+
+	close_ifile(&src);
+	close_ifile(&dest);
+
 	return 0;
 }

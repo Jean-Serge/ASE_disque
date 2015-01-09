@@ -44,7 +44,7 @@ int main(int argc, char *argv[]){
 		return ERR_NOT_VOL;
 	}
 
-	load_super(0);
+	load_super(vol);
 
 	print_super(vol);
 
