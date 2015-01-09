@@ -2,9 +2,7 @@
 
 #define CLOSE_ERROR() fprintf(stderr, "Erreur! Le fichier est fermé.");
 
-
 /****************************** Fonctions utiles ******************************/
-
 unsigned int create_ifile(enum file_type_e type){
 	int i = create_inode(type);
 	return i;
@@ -17,7 +15,7 @@ unsigned int delete_ifile(unsigned int inumber){
 	for(; i < inode.taille; i++){
 		free_bloc(vbloc_of_fbloc(inumber, i, FALSE));
 	}
-	clean_bloc(inumber);
+	free_bloc(inumber);
 	return 1;
 }
 
@@ -31,11 +29,12 @@ int open_ifile(file_desc_t *fd, unsigned int inumber){
 	if(!fd)
 		fd = (file_desc_t *)malloc(sizeof(file_desc_t));
 
-	fd->inoeud = inumber;
-	fd->cursor = 0;
-	fd->size   = inode.taille;
+	fd->inoeud   = inumber;
+	fd->cursor   = 0;
+	fd->size     = inode.taille;
 	fd->modified = NO;
-	fd->closed = NO;
+	fd->closed   = NO;
+	fd->type     = inode.type;
 	fd->file_buffer = (unsigned char *)
 	                  calloc(sizeof(unsigned char),  HDA_SECTORSIZE);
 	/* Lecture du premier bloc d'adressage direct */
@@ -78,7 +77,6 @@ void print_fd(file_desc_t *fd){
 	}
 }
 
-
 int position_to_fbloc(unsigned int position){
 	return position / HDA_SECTORSIZE;
 }
@@ -100,7 +98,6 @@ void flush_ifile(file_desc_t *fd){
 		write_bloc(vol_courant, vbloc_of_fbloc(fd->inoeud, bloc, TRUE), buf);
 	}
 }
-
 
 /**
    Déplacement relatif. Déplacement du curseur de offset octets
@@ -177,7 +174,6 @@ int writec_ifile(file_desc_t *fd, unsigned char c){
 	return 1;
 }
 
-
 int read_ifile(file_desc_t *fd, unsigned char *buf, unsigned int nbyte){
 	int i = 0;
 	int c;
@@ -190,11 +186,14 @@ int read_ifile(file_desc_t *fd, unsigned char *buf, unsigned int nbyte){
 	return i;
 }
 
-
 int write_ifile(file_desc_t *fd, const unsigned char *buf, unsigned int nbyte){
 	int i = 0;
 	for(i = 0; i < nbyte; i++){
 		writec_ifile(fd, buf[i]);
 	}
 	return i;
+}
+
+enum file_type_e get_fd_type(file_desc_t *fd){
+	return fd->type;
 }
