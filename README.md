@@ -1,4 +1,4 @@
-ASE_disque
+﻿ASE_disque
 ==========
 Jean-Serge Monbailly
 Arthur Dewarumez
@@ -14,6 +14,9 @@ Makefile      : le makefile
 
 Pour compiler :
 ===============
+
+	Pour compiler l'ensemble du projet
+		make all
 
 	Pour compiler le programme de création de disque :
 		make create-disk

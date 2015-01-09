@@ -16,12 +16,13 @@ SUFFIX  = .bin
 ### Main targets
 ###------------------------------------------------------------
 BINARIES= create-disk${SUFFIX} dmps${SUFFIX} dvol${SUFFIX} frmt${SUFFIX} mkvol${SUFFIX} print_mbr${SUFFIX} mknfs${SUFFIX}\
-rvol${SUFFIX} tfs${SUFFIX} if_status${SUFFIX} if_pfile${SUFFIX} if_cfile${SUFFIX}
+rvol${SUFFIX} tfs${SUFFIX} if_status${SUFFIX} if_pfile${SUFFIX} if_cfile${SUFFIX} if_nfile${SUFFIX} if_dfile${SUFFIX}
 OBJECTS= $(addsuffix .o,\
 	  mkhd)
 
 #all: $(BINARIES) $(OBJECTS)
-all: create-disk dmps frmt drive volume filesystem dvol print_mbr mkvol mknfs rvol if_status if_pfile if_cfile
+all: create-disk dmps frmt drive volume filesystem dvol print_mbr mkvol mknfs rvol\
+if_status if_pfile if_nfile if_dfile if_cfile
 
 ###------------------------------
 ### Main rules
@@ -67,6 +68,12 @@ if_status: filesystem ${SRCDIR}if_status.c
 
 if_pfile: file ${SRCDIR}if_pfile.c
 	$(CC) $(CFLAGS) -o if_pfile${SUFFIX} drive.o volume.o filesystem.o file.o ${SRCDIR}if_pfile.c ${LIBS}
+
+if_nfile: file ${SRCDIR}if_nfile.c
+	$(CC) $(CFLAGS) -o if_nfile${SUFFIX} drive.o volume.o filesystem.o file.o ${SRCDIR}if_nfile.c ${LIBS}
+
+if_dfile: file ${SRCDIR}if_dfile.c
+	$(CC) $(CFLAGS) -o if_dfile${SUFFIX} drive.o volume.o filesystem.o file.o ${SRCDIR}if_dfile.c ${LIBS}
 
 if_cfile: file ${SRCDIR}if_cfile.c
 	$(CC) $(CFLAGS) -o if_cfile${SUFFIX} drive.o volume.o filesystem.o file.o ${SRCDIR}if_cfile.c ${LIBS}
