@@ -92,9 +92,6 @@ extern unsigned int create_inode(enum file_type_e type);
 
 extern int delete_inode(unsigned int inumber);
 
-extern unsigned int vbloc_of_fbloc(unsigned int inumber, unsigned int fbloc,
-                                   bool_t do_allocate);
-
 /* return the bloc index on the volume of a given bloc index in a
    file.  
    Return BLOC_NULL for a bloc full of zeros */ 
@@ -104,7 +101,7 @@ extern unsigned int vbloc_of_fbloc(unsigned int inumber, unsigned int fbloc);
    file).
    This may imply indirect and d_indirect bloc creation.
    Return BLOC_NULL if no allocation was possible. */
-extern unsigned int allocate_vbloc_of_fbloc(unsigned int inumber, unsigned int bloc);
+extern unsigned int allocate_vbloc_of_fbloc(unsigned int inumber, unsigned int fbloc);
 
 extern void print_inode(unsigned int inumber);
 

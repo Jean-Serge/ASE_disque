@@ -472,16 +472,6 @@ unsigned int allocate(int bloc){
 	}
 }
 
-unsigned int vbloc_of_fbloc(unsigned int inumber, unsigned int fbloc)
-{
-  return aux_vbloc_of_fbloc(inumber, fbloc, FALSE);
-}
-
-unsigned int allocate_vbloc_of_fbloc(unsigned int inumber, unsigned int bloc)
-{
-  return aux_vbloc_of_fbloc(inumber, fbloc, TRUE);
-}
-
 /**
  * Essaie de lire le fbloc-ième de l'inode.
  * Si le bloc est alloué, sont numero est retourné.
@@ -631,4 +621,14 @@ unsigned int aux_vbloc_of_fbloc(unsigned int inumber, unsigned int fbloc,
 		return (table2[idx_lvl2*2] << 8) + table2[idx_lvl2*2+1];
 	}
 	return NULL_BLOC;
+}
+
+unsigned int vbloc_of_fbloc(unsigned int inumber, unsigned int fbloc)
+{
+  return aux_vbloc_of_fbloc(inumber, fbloc, FALSE);
+}
+
+unsigned int allocate_vbloc_of_fbloc(unsigned int inumber, unsigned int fbloc)
+{
+  return aux_vbloc_of_fbloc(inumber, fbloc, TRUE);
 }
