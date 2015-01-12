@@ -1,4 +1,4 @@
-#include "file.h"
+#include "ifile.h"
 
 #define CLOSE_ERROR() fprintf(stderr, "Erreur! Le fichier est fermé.");
 
