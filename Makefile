@@ -22,7 +22,7 @@ OBJECTS= $(addsuffix .o,\
 
 #all: $(BINARIES) $(OBJECTS)
 all: create-disk dmps frmt drive volume filesystem ifile dvol print_mbr mkvol mknfs rvol\
-if_status if_pfile if_nfile if_dfile if_cfile
+if_status if_pfile if_nfile if_dfile if_cfile test_file
 
 ###------------------------------
 ### Main rules
@@ -47,6 +47,12 @@ filesystem: volume ${SRCDIR}filesystem.c ${SRCDIR}filesystem.h
 
 ifile: filesystem ${SRCDIR}ifile.c ${SRCDIR}ifile.h
 	$(CC) $(CFLAGS) -o ifile.o -c ${SRCDIR}ifile.c ${INCDIR}
+
+file: filesystem ${SRCDIR}file.c ${SRCDIR}file.h
+	$(CC) $(CFLAGS) -o file.o -c ${SRCDIR}file.c ${INCDIR}
+
+dir:  ${SRCDIR}dir.c ${SRCDIR}dir.h
+	$(CC) $(CFLAGS) -o dir.o -c ${SRCDIR}dir.c ${INCDIR}
 
 dvol: volume drive ${SRCDIR}dvol.c
 	$(CC) $(CFLAGS) -o dvol${SUFFIX} drive.o volume.o ${SRCDIR}dvol.c ${LIBS}
@@ -77,6 +83,9 @@ if_dfile: ifile ${SRCDIR}if_dfile.c
 
 if_cfile: ifile ${SRCDIR}if_cfile.c
 	$(CC) $(CFLAGS) -o if_cfile${SUFFIX} drive.o volume.o filesystem.o ifile.o ${SRCDIR}if_cfile.c ${LIBS}
+
+test_file: dir ifile file ${SRCDIR}test_file.c
+	$(CC) $(CFLAGS) -o test_file${SUFFIX} drive.o volume.o filesystem.o ifile.o file.o dir.o ${SRCDIR}test_file.c ${LIBS}
 
 ###------------------------------
 ### Testing rules
