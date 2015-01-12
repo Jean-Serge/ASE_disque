@@ -192,6 +192,11 @@ int load_super(unsigned int vol){
 	return 1;
 }
 
+void clear_super(){
+	free(super_courant);
+	super_courant = NULL;
+}
+
 /**
    Enregistre le superbloc courant sur le disque.
  */
