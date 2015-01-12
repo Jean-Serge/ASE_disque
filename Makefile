@@ -67,16 +67,16 @@ if_status: filesystem ${SRCDIR}if_status.c
 	$(CC) $(CFLAGS) -o if_status${SUFFIX} drive.o volume.o filesystem.o ${SRCDIR}if_status.c ${LIBS}
 
 if_pfile: ifile ${SRCDIR}if_pfile.c
-	$(CC) $(CFLAGS) -o if_pfile${SUFFIX} drive.o volume.o filesystem.o file.o ${SRCDIR}if_pfile.c ${LIBS}
+	$(CC) $(CFLAGS) -o if_pfile${SUFFIX} drive.o volume.o filesystem.o ifile.o ${SRCDIR}if_pfile.c ${LIBS}
 
 if_nfile: ifile ${SRCDIR}if_nfile.c
-	$(CC) $(CFLAGS) -o if_nfile${SUFFIX} drive.o volume.o filesystem.o file.o ${SRCDIR}if_nfile.c ${LIBS}
+	$(CC) $(CFLAGS) -o if_nfile${SUFFIX} drive.o volume.o filesystem.o ifile.o ${SRCDIR}if_nfile.c ${LIBS}
 
 if_dfile: ifile ${SRCDIR}if_dfile.c
-	$(CC) $(CFLAGS) -o if_dfile${SUFFIX} drive.o volume.o filesystem.o file.o ${SRCDIR}if_dfile.c ${LIBS}
+	$(CC) $(CFLAGS) -o if_dfile${SUFFIX} drive.o volume.o filesystem.o ifile.o ${SRCDIR}if_dfile.c ${LIBS}
 
 if_cfile: ifile ${SRCDIR}if_cfile.c
-	$(CC) $(CFLAGS) -o if_cfile${SUFFIX} drive.o volume.o filesystem.o file.o ${SRCDIR}if_cfile.c ${LIBS}
+	$(CC) $(CFLAGS) -o if_cfile${SUFFIX} drive.o volume.o filesystem.o ifile.o ${SRCDIR}if_cfile.c ${LIBS}
 
 ###------------------------------
 ### Testing rules
