@@ -21,7 +21,7 @@ OBJECTS= $(addsuffix .o,\
 	  mkhd)
 
 #all: $(BINARIES) $(OBJECTS)
-all: create-disk dmps frmt drive volume filesystem dvol print_mbr mkvol mknfs rvol\
+all: create-disk dmps frmt drive volume filesystem ifile dvol print_mbr mkvol mknfs rvol\
 if_status if_pfile if_nfile if_dfile if_cfile
 
 ###------------------------------
@@ -45,8 +45,8 @@ volume: drive ${SRCDIR}volume.c ${SRCDIR}volume.h
 filesystem: volume ${SRCDIR}filesystem.c ${SRCDIR}filesystem.h
 	$(CC) $(CFLAGS) -o filesystem.o -c ${SRCDIR}filesystem.c ${INCDIR}
 
-file: filesystem ${SRCDIR}file.c ${SRCDIR}file.h
-	$(CC) $(CFLAGS) -o file.o -c ${SRCDIR}file.c ${INCDIR}
+ifile: filesystem ${SRCDIR}ifile.c ${SRCDIR}ifile.h
+	$(CC) $(CFLAGS) -o ifile.o -c ${SRCDIR}ifile.c ${INCDIR}
 
 dvol: volume drive ${SRCDIR}dvol.c
 	$(CC) $(CFLAGS) -o dvol${SUFFIX} drive.o volume.o ${SRCDIR}dvol.c ${LIBS}
@@ -66,16 +66,16 @@ rvol: volume drive ${SRCDIR}rvol.c
 if_status: filesystem ${SRCDIR}if_status.c
 	$(CC) $(CFLAGS) -o if_status${SUFFIX} drive.o volume.o filesystem.o ${SRCDIR}if_status.c ${LIBS}
 
-if_pfile: file ${SRCDIR}if_pfile.c
+if_pfile: ifile ${SRCDIR}if_pfile.c
 	$(CC) $(CFLAGS) -o if_pfile${SUFFIX} drive.o volume.o filesystem.o file.o ${SRCDIR}if_pfile.c ${LIBS}
 
-if_nfile: file ${SRCDIR}if_nfile.c
+if_nfile: ifile ${SRCDIR}if_nfile.c
 	$(CC) $(CFLAGS) -o if_nfile${SUFFIX} drive.o volume.o filesystem.o file.o ${SRCDIR}if_nfile.c ${LIBS}
 
-if_dfile: file ${SRCDIR}if_dfile.c
+if_dfile: ifile ${SRCDIR}if_dfile.c
 	$(CC) $(CFLAGS) -o if_dfile${SUFFIX} drive.o volume.o filesystem.o file.o ${SRCDIR}if_dfile.c ${LIBS}
 
-if_cfile: file ${SRCDIR}if_cfile.c
+if_cfile: ifile ${SRCDIR}if_cfile.c
 	$(CC) $(CFLAGS) -o if_cfile${SUFFIX} drive.o volume.o filesystem.o file.o ${SRCDIR}if_cfile.c ${LIBS}
 
 ###------------------------------
