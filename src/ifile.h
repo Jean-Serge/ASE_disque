@@ -1,58 +1,68 @@
-#ifndef _H_FILE
-#define _H_FILE
+/* ------------------------------
+   $Id: ifile.h 7085 2013-10-18 15:37:14Z marquet $
+   ------------------------------------------------------------
 
-#include "filesystem.h"
-#include "volume.h"
-#include <stdio.h>
-#include <stdlib.h>
-
-#define READ_EOF -1
-
-enum modified_e {YES, NO};
-
-struct file_desc_s{
-	unsigned int inoeud;
-	unsigned int cursor;
-	unsigned int size;
-	unsigned char *file_buffer;
-	enum file_type_e type;
-	enum modified_e modified;
-	enum modified_e closed;
-};
-
-typedef struct file_desc_s file_desc_t;
-
-/*
-  Crée un fichier de type type et retourne sont inœud.
+   File manipulation. 
+   Basic version; manipulate files via their inode number. 
+   Philippe Marquet, october 2002
+   
 */
-extern unsigned int create_ifile(enum file_type_e type);
 
-/*
-  Suppression du fichier correspondant à l'inœud inumber.
-  Retourne 0 si le fichier à été supprimé, sinon 1.
+#ifndef _IFILE_H_
+#define _IFILE_H_
+
+#include "cfile.h"
+#include "inode.h"
+
+/*------------------------------
+  Initialization and finalization
+  ------------------------------------------------------------*/
+
+/* a binary must mount a volume/file system before any other operations.
+   A sole file system mount is allowed.
+   The file system must be umount.
 */
-extern unsigned int delete_ifile(unsigned int inumber);
 
-extern int open_ifile(file_desc_t *fd, unsigned int inumber);
+int mount(unsigned int vol);
+int umount();
 
-extern void print_fd(file_desc_t *fd);
+/*------------------------------
+  File creation and deletion
+  ------------------------------------------------------------*/
 
-extern void close_ifile(file_desc_t *fd);
+/* return the inumber of the newly created file, 0 if error. */
+unsigned int create_ifile(enum file_type_e type);
+/* free all blocs associated to the inode */
+int delete_ifile(unsigned int inumber);
 
-extern void flush_ifile(file_desc_t *fd);
+/*------------------------------
+  File opening
+  ------------------------------------------------------------*/
 
-extern void seek_ifile(file_desc_t *fd, int r_offset);  /* relatif */
+int open_ifile(file_desc_t *fd, unsigned int inumber);
 
-extern void seek2_ifile(file_desc_t *fd, int a_offset); /* absolu */
+/*------------------------------
+  Functions copied from sfile. 
+  ------------------------------------------------------------*/
 
-extern int readc_ifile(file_desc_t *fd);
+#include "sfile.h"
 
-extern int writec_ifile(file_desc_t *fd, unsigned char c);
+/* no inline keyword in ANSI, sorry */
+#define close_ifile(fd) close_sfile((fd))
+#define flush_ifile(fd) flush_sfile((fd))
+#define seek_ifile(fd,offset) seek_sfile((fd), (offset))
+#define seek2_ifile(fd,offset) seek2_sfile((fd), (offset))
+#define readc_ifile(fd) readc_sfile((fd))
+#define writec_ifile(fd,c) writec_sfile((fd), (c))
+#define read_ifile(fd,buf,nbyte) read_sfile((fd),(buf),(nbyte))
+#define write_ifile(fd,buf,nbyte) write_sfile((fd),(buf),(nbyte))
 
-extern int read_ifile(file_desc_t *fd, unsigned char *buf, unsigned int nbyte);
+/*------------------------------
+  Internal fucntions
+  ------------------------------------------------------------*/
 
-extern int write_ifile(file_desc_t *fd, const unsigned char *buf, unsigned int nbyte);
+/* the inode is already loaded, shortcut the begining of open_ifile() */
+int iopen_ifile(file_desc_t *fd, unsigned int inumber, struct inode_s *inode);
 
-extern enum file_type_e get_fd_type(file_desc_t *fd);
 
 #endif
