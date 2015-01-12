@@ -13,7 +13,7 @@ unsigned int delete_ifile(unsigned int inumber){
 	int i = 0;
 	read_inode(inumber, &inode);
 	for(; i < inode.taille; i++){
-		free_bloc(vbloc_of_fbloc(inumber, i, FALSE));
+		free_bloc(vbloc_of_fbloc(inumber, i));
 	}
 	free_bloc(inumber);
 	return 1;
@@ -21,7 +21,7 @@ unsigned int delete_ifile(unsigned int inumber){
 
 int open_ifile(file_desc_t *fd, unsigned int inumber){
 	struct inode_s inode;
-	int frst_blc = vbloc_of_fbloc(inumber, 0 , FALSE);
+	int frst_blc = vbloc_of_fbloc(inumber, 0);
 	unsigned char *buf = (unsigned char *)malloc(sizeof(unsigned char)
 	                                             * HDA_SECTORSIZE);
 	read_inode(inumber, &inode);
@@ -95,7 +95,7 @@ void flush_ifile(file_desc_t *fd){
 		unsigned char *buf = (unsigned char *)malloc(sizeof(unsigned char *) *
 		                                             HDA_SECTORSIZE);
 		memcpy(buf, fd->file_buffer, HDA_SECTORSIZE);
-		write_bloc(vol_courant, vbloc_of_fbloc(fd->inoeud, bloc, TRUE), buf);
+		write_bloc(vol_courant, allocate_vbloc_of_fbloc(fd->inoeud, bloc), buf);
 	}
 }
 
@@ -114,7 +114,7 @@ void seek_ifile(file_desc_t *fd, int r_offset){
 		flush_ifile(fd);
 
 		fbloc = nw_pos / HDA_SECTORSIZE;
-		nxt_blc = vbloc_of_fbloc(fd->inoeud, fbloc, TRUE);
+		nxt_blc = allocate_vbloc_of_fbloc(fd->inoeud, fbloc);
 
 		if(nxt_blc != NULL_BLOC)
 			read_bloc(vol_courant, nxt_blc, fd->file_buffer);
