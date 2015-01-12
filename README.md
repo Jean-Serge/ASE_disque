@@ -71,3 +71,4 @@ TODO
 un int* sur un disque.
 + Modifier les fonctions de filesystem.c utilisant write/read_struct sur un
 int * pour utiliser les fonctions appropriées (delete_inode et fbloc...).
++ Problème avec le super et l'écriture 
