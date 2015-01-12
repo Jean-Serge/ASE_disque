@@ -18,7 +18,7 @@
  */
 extern unsigned char* read_struct(unsigned int vol, unsigned int nbloc,
                                   unsigned int size);
-static int vol_courant;
+int vol_courant;
 
 /**************************  Gestion des superblocs ***************************/
 #define SUPER_MAGIC   0xABCD
