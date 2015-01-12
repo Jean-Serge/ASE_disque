@@ -22,6 +22,10 @@ struct file_desc_s{
 
 typedef struct file_desc_s file_desc_t;
 
+extern int mount(int nvol);
+
+extern int umount();
+
 /*
   Crée un fichier de type type et retourne sont inœud.
 */

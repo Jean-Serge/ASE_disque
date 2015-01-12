@@ -43,6 +43,8 @@ extern void print_super();
 
 extern void save_super();
 
+extern void clear_super();
+
 extern int super_loaded();
 
 /***************************** Gestion des blocs ******************************/
@@ -93,9 +95,9 @@ extern unsigned int create_inode(enum file_type_e type);
 extern int delete_inode(unsigned int inumber);
 
 /* return the bloc index on the volume of a given bloc index in a
-   file.  
-   Return BLOC_NULL for a bloc full of zeros */ 
-extern unsigned int vbloc_of_fbloc(unsigned int inumber, unsigned int fbloc); 
+   file.
+   Return BLOC_NULL for a bloc full of zeros */
+extern unsigned int vbloc_of_fbloc(unsigned int inumber, unsigned int fbloc);
 
 /* allocate and return a bloc on the volume (in order to write in the
    file).

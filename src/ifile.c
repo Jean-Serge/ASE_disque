@@ -2,6 +2,19 @@
 
 #define CLOSE_ERROR() fprintf(stderr, "Erreur! Le fichier est fermé.");
 
+int mount(int nvol){
+	return load_super(nvol);
+}
+
+int umount(){
+	if(super_loaded()){
+		save_super();
+		clear_super();
+		return 1;
+	}
+	return 0;
+}
+
 /****************************** Fonctions utiles ******************************/
 unsigned int create_ifile(enum file_type_e type){
 	int i = create_inode(type);
