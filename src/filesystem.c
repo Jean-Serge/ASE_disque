@@ -184,11 +184,11 @@ int load_super(unsigned int vol){
 		mbr = get_mbr();
 
 	if(vol >= mbr->nvol){
-		return 1;
+		return 0;
 	}
 
 	super_courant = read_super_bloc(vol);
-	return 0;
+	return 1;
 }
 
 /**
@@ -472,13 +472,23 @@ unsigned int allocate(int bloc){
 	}
 }
 
+unsigned int vbloc_of_fbloc(unsigned int inumber, unsigned int fbloc)
+{
+  return aux_vbloc_of_fbloc(inumber, fbloc, FALSE);
+}
+
+unsigned int allocate_vbloc_of_fbloc(unsigned int inumber, unsigned int bloc)
+{
+  return aux_vbloc_of_fbloc(inumber, fbloc, TRUE);
+}
+
 /**
  * Essaie de lire le fbloc-ième de l'inode.
  * Si le bloc est alloué, sont numero est retourné.
  * Sinon si do_allocate est vrai un nouveau bloc est alloué et retourné
  * Sinon retourne 0.
  */
-unsigned int vbloc_of_fbloc(unsigned int inumber, unsigned int fbloc,
+unsigned int aux_vbloc_of_fbloc(unsigned int inumber, unsigned int fbloc,
                             bool_t do_allocate){
 	struct inode_s inode;
 	read_inode(inumber, &inode);
