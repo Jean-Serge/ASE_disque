@@ -53,9 +53,9 @@ extern int readc_ifile(file_desc_t *fd);
 
 extern int writec_ifile(file_desc_t *fd, unsigned char c);
 
-extern int read_ifile(file_desc_t *fd, unsigned char *buf, unsigned int nbyte);
+extern int read_ifile(file_desc_t *fd, void *buf, unsigned int nbyte);
 
-extern int write_ifile(file_desc_t *fd, const unsigned char *buf, unsigned int nbyte);
+extern int write_ifile(file_desc_t *fd, const void *buf, unsigned int nbyte);
 
 extern enum file_type_e get_fd_type(file_desc_t *fd);
 

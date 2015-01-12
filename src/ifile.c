@@ -187,23 +187,27 @@ int writec_ifile(file_desc_t *fd, unsigned char c){
 	return 1;
 }
 
-int read_ifile(file_desc_t *fd, unsigned char *buf, unsigned int nbyte){
+int read_ifile(file_desc_t *fd, void *buf, unsigned int nbyte){
 	int i = 0;
 	int c;
+	char *tmp = (char *)malloc(nbyte);
 	for(i = 0; i < nbyte; i++){
 		c = readc_ifile(fd);
 		if(c == READ_EOF)
 			break;                /* fin du fichier, on stoppe */
-		buf[i] = c;
+		tmp[i] = c;
 	}
+	buf = tmp;
 	return i;
 }
 
-int write_ifile(file_desc_t *fd, const unsigned char *buf, unsigned int nbyte){
+int write_ifile(file_desc_t *fd, const void *buf, unsigned int nbyte){
 	int i = 0;
+	char *tmp = (char *)buf;
 	for(i = 0; i < nbyte; i++){
-		writec_ifile(fd, buf[i]);
+		writec_ifile(fd, tmp[i]);
 	}
+	free(tmp);
 	return i;
 }
 
