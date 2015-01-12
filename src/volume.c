@@ -53,6 +53,38 @@ struct mbr_s *get_mbr(){
 	return mbr;
 }
 
+char char_of_vol_type(enum vol_type type){
+	char val;
+	switch(type){
+	case OTHER:
+		val = CHAR_OTHER;
+	case BASE:
+		val = CHAR_BASE;
+	case ANNEXE:
+		val = CHAR_ANNEXE;
+	default:
+		ffatal(0, "Type de volume incorrect");
+		val = CHAR_NULL;
+	}
+	return val;
+}
+
+enum vol_type vol_type_of_char(char type){
+	enum vol_type val;
+	switch(type){
+	case CHAR_OTHER:
+		val = OTHER;
+	case CHAR_BASE:
+		val = BASE;
+	case CHAR_ANNEXE:
+		val = ANNEXE;
+	default:
+		ffatal(0, "Type de volume incorrect");
+		val = -1;
+	}
+	return val;
+}
+
 void save_mbr(){
 	unsigned char *buffer = (unsigned char *)calloc(HDA_SECTORSIZE,
 	                                                sizeof(unsigned char));

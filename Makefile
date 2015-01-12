@@ -39,11 +39,14 @@ frmt: drive volume.o ${SRCDIR}frmt.c
 drive: ${SRCDIR}drive.c ${SRCDIR}drive.h
 	$(CC) $(CFLAGS) -o drive.o -c ${SRCDIR}drive.c ${INCDIR}
 
-volume: drive ${SRCDIR}volume.c ${SRCDIR}volume.h
-	$(CC) $(CFLAGS) -o volume.o -c ${SRCDIR}volume.c ${INCDIR}
+volume: tools drive ${SRCDIR}volume.c ${SRCDIR}volume.h
+	$(CC) $(CFLAGS) -o volume.o tools.o -c ${SRCDIR}volume.c ${INCDIR}
 
 filesystem: volume ${SRCDIR}filesystem.c ${SRCDIR}filesystem.h
 	$(CC) $(CFLAGS) -o filesystem.o -c ${SRCDIR}filesystem.c ${INCDIR}
+
+tools: ${SRCDIR}tools.c ${SRCDIR}tools.h
+	$(CC) $(CFLAGS) -o tools.o -c ${SRCDIR}tools.c ${LIBS}
 
 ifile: filesystem ${SRCDIR}ifile.c ${SRCDIR}ifile.h
 	$(CC) $(CFLAGS) -o ifile.o -c ${SRCDIR}ifile.c ${INCDIR}
@@ -90,6 +93,7 @@ tfilesystem: filesystem volume drive ${SRCDIR}test_filesystem.c
 
 tfile: file drive volume filesystem volume ${SRCDIR}test_file.c
 	$(CC) $(CFLAGS) -o tfile${SUFFIX} drive.o volume.o  filesystem.o file.o ${SRCDIR}test_file.c ${LIBS}
+
 
 ###------------------------------
 ### Misc.

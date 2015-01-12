@@ -5,13 +5,18 @@
 #include <stdlib.h>
 #include <assert.h>
 #include "drive.h"
+#include "tools.h"
 #include "../include/hardware.h"
 #include "../include/hw_info.h"
 
 
 /******************************* Gestion du MBR *******************************/
-#define MAX_VOLUME 8
-#define MBR_MAGIC 0xB0B0
+#define MAX_VOLUME   8
+#define MBR_MAGIC    0xB0B0
+#define CHAR_OTHER  'B'
+#define CHAR_BASE   'O'
+#define CHAR_ANNEXE 'A'
+#define CHAR_NULL   '\0'
 
 enum vol_type{BASE, ANNEXE, OTHER};
 
@@ -34,6 +39,9 @@ extern void init_mbr_s();
 
 extern void save_mbr();
 
+extern char char_of_vol_type(enum vol_type type);
+
+extern enum vol_type vol_type_of_char(char type);
 
 /***********************  Fonction d'IO sur des blocs *************************/
 extern int convert_bloc(unsigned int nvol, unsigned int bloc,
