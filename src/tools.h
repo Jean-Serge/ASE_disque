@@ -4,6 +4,9 @@
 #define RETURN_FAILURE	(-1)
 #define RETURN_SUCCESS	(0)
 
+#define max(a,b) (a>=b?a:b)
+#define min(a,b) (a<=b?a:b)
+
 #if RETURN_FAILURE >= 0
 # error "RETURN_FAILURE must be negative"
 #endif
@@ -17,5 +20,7 @@ int fatal(int assert, const char *fname, const char *fmt, ...);
 
 /* not yet */
 #define NYI() ffatal(FALSE, "Not Yet Implemented")
+
+extern char *strdup(const char*);
 
 #endif

@@ -11,8 +11,9 @@
 #define _FILE_H_
 
 #include "tools.h"	/* for RETURN_{FAILURE,SUCCESS} */
-#include "inode.h"	/* for file_type_e */
-#include "cfile.h"
+#include "filesystem.h"	/* for file_type_e */
+/*#include "cfile.h"*/
+#include "ifile.h"
 
 /* most of the following functions return RETURN_FAILURE in case of
    failure. */
