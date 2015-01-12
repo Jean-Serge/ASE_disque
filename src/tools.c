@@ -4,7 +4,7 @@
 
    Misc. tools
    Philippe Marquet, october 2002
-   
+
 */
 
 #include <stdio.h>
@@ -19,19 +19,19 @@
 int
 fatal(int assert, const char *fname, const char *fmt, ...)
 {
-    if (! assert) {
-	va_list ap;
-	va_start(ap, fmt);
-	
-	fprintf(stderr, "[Error] %s: ", fname);
-	vfprintf(stderr, fmt, ap);
-	fputc ('\n', stderr);
+	if (! assert) {
+		va_list ap;
+		va_start(ap, fmt);
 
-	exit(EXIT_FAILURE);
-    }
+		fprintf(stderr, "[Error] %s: ", fname);
+		vfprintf(stderr, fmt, ap);
+		fputc ('\n', stderr);
 
-    /* make gcc -W happy */
-    return EXIT_FAILURE;
+		exit(EXIT_FAILURE);
+	}
+
+	/* make gcc -W happy */
+	return EXIT_FAILURE;
 }
 
 /*------------------------------
@@ -44,13 +44,13 @@ fatal(int assert, const char *fname, const char *fmt, ...)
 char *
 strdup(const char *s)
 {
-    size_t siz;
-    char *copy;
-    
-    siz = strlen(s) + 1;
-    if ((copy = malloc(siz)) == NULL)
-	return(NULL);
-    (void)memcpy(copy, s, siz);
-    return(copy);
+	size_t siz;
+	char *copy;
+
+	siz = strlen(s) + 1;
+	if ((copy = malloc(siz)) == NULL)
+		return(NULL);
+	(void)memcpy(copy, s, siz);
+	return(copy);
 }
 #endif /* STRDUP_MISSING */
