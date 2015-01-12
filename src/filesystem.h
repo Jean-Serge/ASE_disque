@@ -43,6 +43,8 @@ extern void print_super();
 
 extern void save_super();
 
+extern int super_loaded();
+
 /***************************** Gestion des blocs ******************************/
 struct free_bloc_s{
 	int magic;          /* 2o */

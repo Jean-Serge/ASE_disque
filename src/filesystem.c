@@ -202,6 +202,10 @@ void save_super(){
 	write_super_bloc(vol_courant, super_courant);
 }
 
+int super_loaded()
+{
+  return super_courant == NULL;
+}
 
 /***************************** Gestion des blocs ******************************/
 
