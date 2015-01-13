@@ -3,7 +3,6 @@
 #include "drive.h"
 #include "volume.h"
 #include "filesystem.h"
-#include "drive.h"
 
 #define ENV_VAR_NAME "CURRENT_VOLUME"
 
