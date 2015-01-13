@@ -59,6 +59,26 @@ int open_ifile(file_desc_t *fd, unsigned int inumber){
 	return 0;
 }
 
+extern int iopen_ifile(file_desc_t *fd, unsigned int inumber,
+                       struct inode_s *inode){
+	unsigned int first_bloc;
+
+	/* réinitialisation du file descriptor */
+	fd->inoeud = inumber;
+	fd->cursor = 0;
+	fd->size = inode->taille;
+
+	/* Réinitialisation du tampon du file descriptor */
+	first_bloc = vbloc_of_fbloc(inumber, 0);
+	if(first_bloc == 0){
+		memset(fd->file_buffer, 0, HDA_SECTORSIZE);
+	}
+	else{
+		read_bloc(vol_courant, first_bloc, fd->file_buffer);
+	}
+	return 1;
+}
+
 void print_fd(file_desc_t *fd){
 	printf("Présentation du File Descriptor :\n");
 	printf("\tInœud     : %d\n", fd->inoeud);

@@ -39,6 +39,9 @@ extern unsigned int delete_ifile(unsigned int inumber);
 
 extern int open_ifile(file_desc_t *fd, unsigned int inumber);
 
+extern int iopen_ifile(file_desc_t *fd, unsigned int inumber,
+                       struct inode_s *inode);
+
 extern void print_fd(file_desc_t *fd);
 
 extern void close_ifile(file_desc_t *fd);
