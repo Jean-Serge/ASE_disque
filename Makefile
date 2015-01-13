@@ -63,7 +63,7 @@ dvol: volume drive ${SRCDIR}dvol.c
 mkvol: volume drive ${SRCDIR}mkvol.c
 	$(CC) $(CFLAGS) -o mkvol${SUFFIX} drive.o volume.o tools.o ${SRCDIR}mkvol.c ${LIBS}
 
-mknfs: volume drive filesystem ${SRCDIR}mknfs.c
+mknfs: volume drive filesystem tools ${SRCDIR}mknfs.c
 	$(CC) $(CFLAGS) -o mknfs${SUFFIX} drive.o volume.o filesystem.o tools.o ${SRCDIR}mknfs.c ${LIBS}
 
 print_mbr: volume drive ${SRCDIR}print_mbr.c
