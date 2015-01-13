@@ -39,47 +39,26 @@ int read_vol(char *volume){
 }
 
 int main(int argc, char *argv[]){
-	int ifile, vol;
-	char ch;
-	file_desc_t fd;
+  int inum;
+  file_desc_t fd;
+  const char* s = "Salut c'est moi.";
+  
+  mkhd();
+  mount(0);
+  
+  inum = create_file("/", DIRECTORY);
+printf("LOLO");
+  open_file(&fd, "/");
+  
+  /* writec_file(&fd, 'A'); */
+  /* writec_file(&fd, 'A'); */
+  /* writec_file(&fd, 'A'); */
+  /* writec_file(&fd, 'A'); */
+  /* writec_file(&fd, 'A'); */
+  /* writec_file(&fd, 'A'); */
+  close_file(&fd);
 
-	if(argc != 3){
-		usage();
-		exit(ERR_ARGT);
-	}
-
-	vol = read_vol(argv[1]);
-
-	mkhd();
-	load_super(vol);
-
-	printf("Création d'un fichier de type ");
-	if(argv[2][0] == 'N'){
-		printf("NORMAL");
-		ifile = create_ifile(NORMAL);
-	}
-	if(argv[2][0] == 'D'){
-		printf("DIRECTORY");
-		ifile = create_ifile(DIRECTORY);
-	}
-	if(argv[2][0] == 'L'){
-		printf("LINK");
-		ifile = create_ifile(LINK);
-	}
-	if(argv[2][0] == 'S'){
-		printf("SPECIAL");
-		ifile = create_ifile(SPECIAL);
-	}
-
-	printf("\nInode %d\n", ifile);
-	fflush(stdout);
-	open_ifile(&fd, ifile);
-
-	while(read(STDIN_FILENO, &ch, 1) > 0){
-		printf("%c", ch);
-		writec_ifile(&fd, ch);
-	}
-
-	close_ifile(&fd);
-	return 0;
+  /* fd = create_file("Bonjour", DIRECTORY); */
+  /* writec_file(fd, 'Z'); */
+  return EXIT_SUCCESS;
 }
