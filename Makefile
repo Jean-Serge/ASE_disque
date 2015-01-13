@@ -34,13 +34,13 @@ dmps: drive volume ${SRCDIR}dmps.c
 	$(CC) $(CFLAGS) -o dmps${SUFFIX} drive.o ${SRCDIR}dmps.c ${LIBS}
 
 frmt: drive volume.o ${SRCDIR}frmt.c
-	$(CC) $(CFLAGS) -o frmt${SUFFIX} drive.o volume.o ${SRCDIR}frmt.c ${LIBS}
+	$(CC) $(CFLAGS) -o frmt${SUFFIX} drive.o volume.o tools.o ${SRCDIR}frmt.c ${LIBS}
 
 drive: ${SRCDIR}drive.c ${SRCDIR}drive.h
 	$(CC) $(CFLAGS) -o drive.o -c ${SRCDIR}drive.c ${INCDIR}
 
 volume: tools drive ${SRCDIR}volume.c ${SRCDIR}volume.h
-	$(CC) $(CFLAGS) -o volume.o tools.o -c ${SRCDIR}volume.c ${INCDIR}
+	$(CC) $(CFLAGS) -o volume.o -c ${SRCDIR}volume.c ${INCDIR}
 
 filesystem: volume ${SRCDIR}filesystem.c ${SRCDIR}filesystem.h
 	$(CC) $(CFLAGS) -o filesystem.o -c ${SRCDIR}filesystem.c ${INCDIR}
@@ -58,37 +58,37 @@ dir:  ${SRCDIR}dir.c ${SRCDIR}dir.h
 	$(CC) $(CFLAGS) -o dir.o -c ${SRCDIR}dir.c ${INCDIR}
 
 dvol: volume drive ${SRCDIR}dvol.c
-	$(CC) $(CFLAGS) -o dvol${SUFFIX} drive.o volume.o ${SRCDIR}dvol.c ${LIBS}
+	$(CC) $(CFLAGS) -o dvol${SUFFIX} drive.o volume.o tools.o ${SRCDIR}dvol.c ${LIBS}
 
 mkvol: volume drive ${SRCDIR}mkvol.c
-	$(CC) $(CFLAGS) -o mkvol${SUFFIX} drive.o volume.o ${SRCDIR}mkvol.c ${LIBS}
+	$(CC) $(CFLAGS) -o mkvol${SUFFIX} drive.o volume.o tools.o ${SRCDIR}mkvol.c ${LIBS}
 
 mknfs: volume drive filesystem ${SRCDIR}mknfs.c
-	$(CC) $(CFLAGS) -o mknfs${SUFFIX} drive.o volume.o filesystem.o ${SRCDIR}mknfs.c ${LIBS}
+	$(CC) $(CFLAGS) -o mknfs${SUFFIX} drive.o volume.o filesystem.o tools.o ${SRCDIR}mknfs.c ${LIBS}
 
 print_mbr: volume drive ${SRCDIR}print_mbr.c
-	$(CC) $(CFLAGS) -o print_mbr${SUFFIX} drive.o volume.o ${SRCDIR}print_mbr.c ${LIBS}
+	$(CC) $(CFLAGS) -o print_mbr${SUFFIX} drive.o volume.o tools.o ${SRCDIR}print_mbr.c ${LIBS}
 
 rvol: volume drive ${SRCDIR}rvol.c
-	$(CC) $(CFLAGS) -o rvol${SUFFIX} drive.o volume.o ${SRCDIR}rvol.c ${LIBS}
+	$(CC) $(CFLAGS) -o rvol${SUFFIX} drive.o volume.o tools.o ${SRCDIR}rvol.c ${LIBS}
 
 if_status: filesystem ${SRCDIR}if_status.c
-	$(CC) $(CFLAGS) -o if_status${SUFFIX} drive.o volume.o filesystem.o ${SRCDIR}if_status.c ${LIBS}
+	$(CC) $(CFLAGS) -o if_status${SUFFIX} drive.o volume.o filesystem.o tools.o ${SRCDIR}if_status.c ${LIBS}
 
 if_pfile: ifile ${SRCDIR}if_pfile.c
-	$(CC) $(CFLAGS) -o if_pfile${SUFFIX} drive.o volume.o filesystem.o ifile.o ${SRCDIR}if_pfile.c ${LIBS}
+	$(CC) $(CFLAGS) -o if_pfile${SUFFIX} drive.o volume.o filesystem.o ifile.o tools.o ${SRCDIR}if_pfile.c ${LIBS}
 
 if_nfile: ifile ${SRCDIR}if_nfile.c
-	$(CC) $(CFLAGS) -o if_nfile${SUFFIX} drive.o volume.o filesystem.o ifile.o ${SRCDIR}if_nfile.c ${LIBS}
+	$(CC) $(CFLAGS) -o if_nfile${SUFFIX} drive.o volume.o filesystem.o ifile.o tools.o ${SRCDIR}if_nfile.c ${LIBS}
 
 if_dfile: ifile ${SRCDIR}if_dfile.c
-	$(CC) $(CFLAGS) -o if_dfile${SUFFIX} drive.o volume.o filesystem.o ifile.o ${SRCDIR}if_dfile.c ${LIBS}
+	$(CC) $(CFLAGS) -o if_dfile${SUFFIX} drive.o volume.o filesystem.o ifile.o tools.o ${SRCDIR}if_dfile.c ${LIBS}
 
 if_cfile: ifile ${SRCDIR}if_cfile.c
-	$(CC) $(CFLAGS) -o if_cfile${SUFFIX} drive.o volume.o filesystem.o ifile.o ${SRCDIR}if_cfile.c ${LIBS}
+	$(CC) $(CFLAGS) -o if_cfile${SUFFIX} drive.o volume.o filesystem.o ifile.o tools.o ${SRCDIR}if_cfile.c ${LIBS}
 
 test_file: dir ifile file ${SRCDIR}test_file.c
-	$(CC) $(CFLAGS) -o test_file${SUFFIX} drive.o volume.o filesystem.o ifile.o file.o dir.o ${SRCDIR}test_file.c ${LIBS}
+	$(CC) $(CFLAGS) -o test_file${SUFFIX} drive.o volume.o filesystem.o ifile.o file.o dir.o tools.o ${SRCDIR}test_file.c ${LIBS}
 
 ###------------------------------
 ### Testing rules
