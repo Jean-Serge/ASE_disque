@@ -35,8 +35,6 @@ struct superbloc_s{
 	char *name;         /* 32 octets */
 };
 
-struct superbloc_s* super_courant = NULL;
-
 extern void init_super(unsigned int vol, char *name);
 
 extern int load_super(unsigned int vol);
@@ -48,6 +46,8 @@ extern void save_super();
 extern void clear_super();
 
 extern int super_loaded();
+
+extern struct superbloc_s *get_super();
 
 /***************************** Gestion des blocs ******************************/
 struct free_bloc_s{

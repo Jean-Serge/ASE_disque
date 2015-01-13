@@ -1,6 +1,7 @@
 #include "filesystem.h"
 
 static struct mbr_s *mbr = NULL;
+static struct superbloc_s* super_courant = NULL;
 
 /************** Fonctions d'I/O pour les structures free_bloc_s ***************/
 /**
@@ -212,6 +213,10 @@ int super_loaded()
   return super_courant == NULL;
 }
 
+struct superbloc_s *get_super()
+{
+  return super_courant;
+}
 /***************************** Gestion des blocs ******************************/
 
 void clean_bloc(unsigned int bloc){
