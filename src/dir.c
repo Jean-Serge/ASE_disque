@@ -201,7 +201,7 @@ inumber_of_path(const char *pathname)
 	return 0;
 
     /* start at root */
-    icurrent = super_courant->inode;
+    icurrent = get_super()->inode;
     
     while (*pathname) {
 	if (*pathname != '/') {

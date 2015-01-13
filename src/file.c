@@ -6,8 +6,7 @@
    Philippe Marquet, october 2002
    
 */
-
-#include "mbr.h"
+#include "volume.h"
 #include "filesystem.h"
 #include "ifile.h"
 #include "dir.h"
