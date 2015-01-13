@@ -35,7 +35,7 @@ struct superbloc_s{
 	char *name;         /* 32 octets */
 };
 
-struct superbloc_s *super_courant = NULL;
+struct superbloc_s* super_courant = NULL;
 
 extern void init_super(unsigned int vol, char *name);
 
@@ -108,5 +108,6 @@ extern unsigned int vbloc_of_fbloc(unsigned int inumber, unsigned int fbloc);
 extern unsigned int allocate_vbloc_of_fbloc(unsigned int inumber, unsigned int fbloc);
 
 extern void print_inode(unsigned int inumber);
+
 
 #endif

@@ -2,13 +2,13 @@
 
 static struct mbr_s *mbr = NULL;
 
-
 /************** Fonctions d'I/O pour les structures free_bloc_s ***************/
 /**
    Écrit la structure free_bloc_s free_blc sur le bloc bloc du volume vol.
  */
-void write_free_bloc(unsigned int vol, unsigned int bloc,
-                     struct free_bloc_s *free_blc){
+void write_free_bloc(unsigned int vol, unsigned int bloc, struct free_bloc_s *free_blc)
+{
+
 	unsigned char *buf = (unsigned char *)calloc(HDA_SECTORSIZE,
 	                                             sizeof(unsigned char));
 	/* Écriture du magic */
