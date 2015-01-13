@@ -1,7 +1,6 @@
 #include "filesystem.h"
 
 static struct mbr_s *mbr = NULL;
-static struct superbloc_s *super_courant = NULL;
 
 
 /************** Fonctions d'I/O pour les structures free_bloc_s ***************/

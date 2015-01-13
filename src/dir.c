@@ -77,7 +77,6 @@ add_entry(unsigned int idir, unsigned int inumber, const char *basename)
     struct entry_s entry; 
     unsigned int ientry = 0;
     int nbyte; 
-    int status;
     
     /* a directory inode? */
     read_inode(idir, &inode); 
@@ -202,7 +201,7 @@ inumber_of_path(const char *pathname)
 	return 0;
 
     /* start at root */
-    icurrent = super.super_root;
+    icurrent = super_courant->inode;
     
     while (*pathname) {
 	if (*pathname != '/') {
