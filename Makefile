@@ -1,4 +1,4 @@
-ROOTDIR=/home/m1/monbailly/Documents/ASE/ASE_disque
+ROOTDIR=.
 
 CC	= gcc
 CFLAGS	= -Wall -ansi -pedantic 
