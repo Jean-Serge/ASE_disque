@@ -39,6 +39,8 @@ int execute(char *cmd)
 
   if(strcmp(cmd, "ls") == 0)
     return my_ls(split, argc);
+  else if(strcmp(cmd, "cd") == 0)
+    return my_cd(split, argc);
   else
     {
       printf("Commande inconnue\n");

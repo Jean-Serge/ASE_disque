@@ -6,6 +6,7 @@
 #include <stdlib.h> 
 
 #include "my_ls.h"
+#include "my_cd.h"
 
 /**
  * Split la ligne de commande cmd en utilisant delim et en 
