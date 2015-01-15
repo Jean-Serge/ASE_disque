@@ -10,7 +10,7 @@
 
 #define CMD_SIZE 101
 
-char *wd = NULL;
+char *wd;
 
 extern char *get_home();
 
