@@ -1,3 +1,6 @@
+#ifndef H_SHELL
+#define H_SHELL
+
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
@@ -14,3 +17,5 @@ extern void display_prompt();
  * autre chaîne.
  */ 
 extern void my_fgets(char *cmd, unsigned int size);
+
+#endif
