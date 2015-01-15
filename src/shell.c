@@ -1,43 +1,27 @@
-#include "shell.h"
+#include <stdlib.h>
+#include <stdio.h>
+#include <string.h>
 
+#include "cmd.h"
+
+#define CMD_SIZE 101
+
+/** 
+ * Affiche le prompt.
+ * TODO : compléter pour un affichage plus complet.
+ */
 void display_prompt()
 {
   printf(">");
 }
 
-/** 
- * TODO : sécuriser les appels à realloc
- * TODO : voir la fonction strtok_r pour sécuriser 
- * en cas de multi-thread (voir pour la suite du cours)
+/**
+ * Lit au plus size - 1 caractères sur l'entrée standard et les 
+ * écrit dans cmd, ignore les caractères suivant.
+ * Si une ligne entrée fait plus de size caractères, cette fonction
+ * ignorera les caractères en plus et ne les considérera pas comme une 
+ * autre chaîne.
  */ 
-void split_cmd(char *cmd, char **split, char *delim)
-{
-  char *token;
-  int i = 1, j;
-  split[0] = strtok(cmd, delim);
-  
-  
-  while((token = strtok(NULL, delim)) != NULL)
-    {
-      if(i >= 10)
-	split = (char **)realloc(split, (i+1)*sizeof(char *));
-      split[i++] = token;
-    }
-
-  for(j = 0 ; j < i ; j++)
-    printf("%s\n", split[j]);
-}
-
-int execute(char *cmd)
-{
-  char **split = (char **)malloc(sizeof(char *) * 10);
-  split_cmd(cmd, split, " \t\n");
-
-
-
-  return 0;
-}
-
 void my_fgets(char *cmd, unsigned int size)
 {
   int i;
@@ -58,13 +42,13 @@ void my_fgets(char *cmd, unsigned int size)
 
   cmd[i+1] = '\0';
 
+  /* Ignore les caractère suivant. */
   while(1)
     {
       c = getchar();
       if(c == EOF || c == '\n')
 	return;
     }
-  
 }
 
 int main(void)
