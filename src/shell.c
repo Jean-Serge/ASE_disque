@@ -1,10 +1,4 @@
-#include <stdlib.h>
-#include <stdio.h>
-#include <string.h>
-
-#include "cmd.h"
-
-#define CMD_SIZE 101
+#include "shell.h"
 
 /** 
  * Affiche le prompt.
@@ -54,7 +48,8 @@ void my_fgets(char *cmd, unsigned int size)
 int main(void)
 {
   char *cmd = (char *)malloc(CMD_SIZE);
- 
+  wd = "/";
+  
   while(1)
     {
       display_prompt();
