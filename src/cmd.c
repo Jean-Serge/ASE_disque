@@ -5,10 +5,10 @@
  * TODO : voir la fonction strtok_r pour sécuriser 
  * en cas de multi-thread (voir pour la suite du cours)
  */ 
-void split_cmd(char *cmd, char **split, char *delim)
+unsigned int split_cmd(char *cmd, char **split, char *delim)
 {
   char *token;
-  int i = 1;
+  unsigned int i = 1;
   /* int j; */
 
   split[0] = strtok(cmd, delim);
@@ -26,14 +26,22 @@ void split_cmd(char *cmd, char **split, char *delim)
   /* Décommenter pour afficher le résultat du split */
   /* for(j = 0 ; j < i ; j++) */
   /*   printf("%s\n", split[j]); */
+
+  return i;
 }
 
 int execute(char *cmd)
 {
+  int argc; 
   char **split = (char **)malloc(sizeof(char *) * 10);
-  split_cmd(cmd, split, " \t\n");
+  argc = split_cmd(cmd, split, " \t\n");
   cmd = split[0];
- 
 
-  return 0;
+  if(strcmp(cmd, "ls") == 0)
+    return my_ls(split, argc);
+  else
+    {
+      printf("Commande inconnue\n");
+      return 1;
+    }
 }

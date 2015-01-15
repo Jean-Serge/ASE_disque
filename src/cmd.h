@@ -5,11 +5,14 @@
 #include <stdio.h>
 #include <stdlib.h> 
 
+#include "my_ls.h"
+
 /**
  * Split la ligne de commande cmd en utilisant delim et en 
  * stockant le résultat dans split.
+ * Retourne le nombre d'argument (incluant la commande elle-même).
  */
-extern void split_cmd(char *cmd, char **split, char *delim);
+extern unsigned int split_cmd(char *cmd, char **split, char *delim);
 
 /**
  * Exécute la ligne de commande passée en paramètre.
