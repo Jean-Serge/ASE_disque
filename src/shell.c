@@ -1,9 +1,4 @@
-#include <stdlib.h>
-#include <stdio.h>
-#include <string.h>
-
-#define CMD_SIZE 101
-
+#include "shell.h"
 
 void display_prompt()
 {
@@ -29,17 +24,47 @@ void split_cmd(char *cmd, char **split, char *delim)
       split[i++] = token;
     }
 
-    for(j = 0 ; j < i ; j++)
-      printf("%s\n", split[j]);  
+  for(j = 0 ; j < i ; j++)
+    printf("%s\n", split[j]);
 }
 
 int execute(char *cmd)
 {
   char **split = (char **)malloc(sizeof(char *) * 10);
-
   split_cmd(cmd, split, " \t\n");
 
+
+
   return 0;
+}
+
+void my_fgets(char *cmd, unsigned int size)
+{
+  int i;
+  char c;
+  /* On lit CMD_SIZE - 1 caractères sur l'entrée standard. */
+  for(i = 0 ; i < size - 1 ; i++)
+    {
+      c = getchar();
+
+      if(c == '\n' || c == EOF)
+	{
+	  cmd[i] = '\0';
+	  return;
+	}
+
+      cmd[i] = c;
+    }
+
+  cmd[i+1] = '\0';
+
+  while(1)
+    {
+      c = getchar();
+      if(c == EOF || c == '\n')
+	return;
+    }
+  
 }
 
 int main(void)
@@ -50,8 +75,10 @@ int main(void)
     {
       display_prompt();
       /* On lit la ligne de commande entrée */
-      fgets(cmd, CMD_SIZE, stdin);
+      my_fgets(cmd, CMD_SIZE);
+
       execute(cmd);
     }
+
   exit(EXIT_SUCCESS);
 }
