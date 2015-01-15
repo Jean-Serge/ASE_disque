@@ -90,6 +90,8 @@ if_cfile: ifile ${SRCDIR}if_cfile.c
 test_file: dir ifile file ${SRCDIR}test_file.c
 	$(CC) $(CFLAGS) -o test_file${SUFFIX} drive.o volume.o filesystem.o ifile.o file.o dir.o tools.o ${SRCDIR}test_file.c ${LIBS}
 
+shell: ${SRCDIR}shell.c
+	$(CC) $(CFLAGS) -o shell${SUFFIX} ${SRCDIR}shell.c
 ###------------------------------
 ### Testing rules
 ###------------------------------------------------------------
