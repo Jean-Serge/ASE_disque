@@ -37,6 +37,8 @@ int execute(char *cmd)
   argc = split_cmd(cmd, split, " \t\n");
   cmd = split[0];
 
+	if(cmd == NULL)
+		return 0;
   if(strcmp(cmd, "ls") == 0)
     return my_ls(split, argc);
   else if(strcmp(cmd, "cd") == 0)
