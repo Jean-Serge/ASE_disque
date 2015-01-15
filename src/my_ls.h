@@ -2,12 +2,13 @@
 #define H_MY_LS
 
 #include <stdio.h>
+#include <string.h>
 
 /**
  * Effectue notre version de la commande ls.
- * Liste le contenu du répertoire pathname.
- * Les arguments excluent le nom de la commande elle même.
+ * Les arguments incluent le nom de la commande elle même.
+ * Retourne le code de retour de la commande ls.
  */
-extern void my_ls(char *pathname, char **args);
+extern int my_ls(char **args, int argc);
 
 #endif
