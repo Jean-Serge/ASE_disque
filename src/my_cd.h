@@ -4,6 +4,8 @@
 #include <stdio.h>
 #include <string.h>
 
+#include "shell.h"
+
 /**
  * Change le répertoire courant en fonction des paramètres.
  */
