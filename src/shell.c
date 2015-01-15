@@ -9,6 +9,10 @@ void display_prompt()
   printf(">");
 }
 
+char *get_home()
+{
+	return "/";
+}
 /**
  * Lit au plus size - 1 caractères sur l'entrée standard et les 
  * écrit dans cmd, ignore les caractères suivant.

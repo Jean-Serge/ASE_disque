@@ -12,4 +12,6 @@
 
 char *wd = NULL;
 
+extern char *get_home();
+
 #endif
