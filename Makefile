@@ -45,9 +45,6 @@ volume: tools drive ${SRCDIR}volume.c ${SRCDIR}volume.h
 filesystem: volume ${SRCDIR}filesystem.c ${SRCDIR}filesystem.h
 	$(CC) $(CFLAGS) -o filesystem.o -c ${SRCDIR}filesystem.c ${INCDIR}
 
-cmd: ${SRCDIR}cmd.c ${SRCDIR}cmd.h
-	$(CC) $(CFLAGS) -o cmd.o -c ${SRCDIR}cmd.c
-
 tools: ${SRCDIR}tools.c ${SRCDIR}tools.h
 	$(CC) $(CFLAGS) -o tools.o -c ${SRCDIR}tools.c ${LIBS}
 
@@ -94,7 +91,14 @@ test_file: dir ifile file ${SRCDIR}test_file.c
 	$(CC) $(CFLAGS) -o test_file${SUFFIX} drive.o volume.o filesystem.o ifile.o file.o dir.o tools.o ${SRCDIR}test_file.c ${LIBS}
 
 shell:  cmd ${SRCDIR}shell.c
-	$(CC) $(CFLAGS) -o shell${SUFFIX} cmd.o ${SRCDIR}shell.c 
+	$(CC) $(CFLAGS) -o shell${SUFFIX} cmd.o my_ls.o ${SRCDIR}shell.c 
+
+my_ls: ${SRCDIR}my_ls.c ${SRCDIR}my_ls.h
+	$(CC) $(CFLAGS) -o my_ls.o -c ${SRCDIR}my_ls.c 
+
+cmd: my_ls ${SRCDIR}cmd.c ${SRCDIR}cmd.h
+	$(CC) $(CFLAGS) -o cmd.o -c ${SRCDIR}cmd.c
+
 ###------------------------------
 ### Testing rules
 ###------------------------------------------------------------
