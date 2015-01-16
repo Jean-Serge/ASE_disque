@@ -65,6 +65,20 @@ Description d'un volume :
 |   début   |   début   |                       |           |
 +-----------+-----------+-----------+-----------+-----------+
 
+Commandes du Shell :
+====================
+
+Le shell contient 2 variables importantes :
++ wd (working directory) acceessible depuis le fichier shell.h
++ home accessible via la fonction get-home()
+
+Le shell prend en charge les commandes suivantes :
++ pwd (fonctionnelle)
++ cd (seule la commande sans paramètre est implémentée)
++ ls (non-implémentée)
+
+
+
 TODO
 + Ajouter dans le programme de test la mise en place de valeur par défaut.
 + Dans le fichier filesystem.c, écrire fonction pour lire écrire
@@ -72,3 +86,5 @@ un int* sur un disque.
 + Modifier les fonctions de filesystem.c utilisant write/read_struct sur un
 int * pour utiliser les fonctions appropriées (delete_inode et fbloc...).
 + Problème avec le super et l'écriture 
++ Voir si il faut passer la variable wd de shell.h en static dans le .c et 
+y accèder via fonctions
