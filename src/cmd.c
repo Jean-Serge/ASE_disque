@@ -43,6 +43,8 @@ int execute(char *cmd)
     return my_ls(split, argc);
   else if(strcmp(cmd, "cd") == 0)
     return my_cd(split, argc);
+	else if(strcmp(cmd,"pwd") == 0)
+	return my_pwd(split, argc);
   else
     {
       printf("Commande inconnue\n");

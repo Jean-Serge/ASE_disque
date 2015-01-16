@@ -7,6 +7,7 @@
 
 #include "my_ls.h"
 #include "my_cd.h"
+#include "my_pwd.h"
 
 /**
  * Split la ligne de commande cmd en utilisant delim et en 
