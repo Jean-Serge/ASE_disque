@@ -91,7 +91,7 @@ test_file: dir ifile file ${SRCDIR}test_file.c
 	$(CC) $(CFLAGS) -o test_file${SUFFIX} drive.o volume.o filesystem.o ifile.o file.o dir.o tools.o ${SRCDIR}test_file.c ${LIBS}
 
 shell:  cmd ${SRCDIR}shell.c
-	$(CC) $(CFLAGS) -o shell${SUFFIX} cmd.o my_ls.o my_cd.o ${SRCDIR}shell.c 
+	$(CC) $(CFLAGS) -o shell${SUFFIX} cmd.o my_ls.o my_cd.o my_pwd.o ${SRCDIR}shell.c 
 
 my_ls: ${SRCDIR}my_ls.c ${SRCDIR}my_ls.h
 	$(CC) $(CFLAGS) -o my_ls.o -c ${SRCDIR}my_ls.c 
@@ -99,7 +99,10 @@ my_ls: ${SRCDIR}my_ls.c ${SRCDIR}my_ls.h
 my_cd: ${SRCDIR}my_cd.c ${SRCDIR}my_cd.h
 	$(CC) $(CFLAGS) -o my_cd.o -c ${SRCDIR}my_cd.c 
 
-cmd: my_cd my_ls ${SRCDIR}cmd.c ${SRCDIR}cmd.h
+my_pwd: ${SRCDIR}my_pwd.c ${SRCDIR}my_pwd.h
+	$(CC) $(CFLAGS) -o my_pwd.o -c ${SRCDIR}my_pwd.c 
+
+cmd: my_cd my_ls my_pwd ${SRCDIR}cmd.c ${SRCDIR}cmd.h
 	$(CC) $(CFLAGS) -o cmd.o -c ${SRCDIR}cmd.c
 
 ###------------------------------
