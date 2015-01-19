@@ -29,11 +29,10 @@ int vol_courant;
 struct superbloc_s{
 	int magic;          /* 2 octets */
 	int serial;         /* 4 octets : timestamp */
-	int inode;          /* le premier inode sur le disque : 2 octets */
+	int root;          /* le premier inode sur le disque : 2 octets */
 	int nb_free_blc;    /* 2 octets */
 	int first_free;     /* le premier bloc libre sur le disque : 2 octets */
 	char *name;         /* 32 octets */
-	int root;           /* Inumber du répertoire racine */
 };
 
 extern void write_super_bloc(unsigned int vol, struct superbloc_s *super_blc);

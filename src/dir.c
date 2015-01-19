@@ -94,8 +94,8 @@ add_entry(unsigned int idir, unsigned int inumber, const char *basename)
     strncpy(entry.ent_basename, basename, ENTRYMAXLENGTH);
     print_fd(fd);
 
-    entry.ent_basename[ENTRYMAXLENGTH] = 0;
-    printf("%p \t %p", &(fd->inoeud), entry.ent_basename);
+    entry.ent_basename[ENTRYMAXLENGTH - 1] = 0;
+    printf("Adresse de l'inoeud de fd : %p \nAdresse du début de ent_basename : %p\nAdresse de la fin de ent_basename : %p\n", &(fd->inoeud), entry.ent_basename, &entry.ent_basename[ENTRYMAXLENGTH-1]);
     print_fd(fd);
 
     /* seek to the right position */

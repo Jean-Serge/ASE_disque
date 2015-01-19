@@ -67,8 +67,8 @@ void write_super_bloc(unsigned int vol, struct superbloc_s *super_blc){
 	buf[5] = super_blc->serial;
 
 	/* écriture du prochain inœud */
-	buf[6] = super_blc->inode >>8;
-	buf[7] = ((super_blc->inode<<8)>>8) & 0xFF;
+	buf[6] = super_blc->root >>8;
+	buf[7] = ((super_blc->root<<8)>>8) & 0xFF;
 
 	/* écriture du nombre de blocs libre */
 	buf[8] = super_blc->nb_free_blc >>8;
@@ -83,8 +83,6 @@ void write_super_bloc(unsigned int vol, struct superbloc_s *super_blc){
 		buf[12+i] = super_blc->name[i];
 		i++;
 	}
-	buf[12+SUPER_SZ_NAME] = super_blc->root>>8;
-	buf[12+SUPER_SZ_NAME+1] = ((super_blc->root<<8)>>8) & 0xFF;
 	write_bloc(vol, 0, buf);
 }
 
@@ -108,7 +106,7 @@ struct superbloc_s *read_super_bloc(unsigned int vol){
 		+ (buf[5] & 0xFF);
 
 	/* lecture de l'adresse du prochain inœud */
-	super->inode =  + (buf[6] <<8) + (buf[7] & 0xFF);
+	super->root =  + (buf[6] <<8) + (buf[7] & 0xFF);
 
 	/* lecture du nombre de bloc libre */
 	super->nb_free_blc = (buf[8] <<8) + (buf[9] & 0xFF);
@@ -119,7 +117,6 @@ struct superbloc_s *read_super_bloc(unsigned int vol){
 	/* lecture du nom du volume */
 	super->name = (char *)calloc(SUPER_SZ_NAME, sizeof(char));
 	super->name = strncpy(super->name, buf+12, SUPER_SZ_NAME);
-	super->root = (buf[12+SUPER_SZ_NAME] <<8) + (buf[12+SUPER_SZ_NAME+1] & 0xFF);
 	return super;
 }
 
@@ -153,7 +150,7 @@ void init_super(unsigned int vol, char *name){
 	}
 	super_courant->nb_free_blc = volume.nsector-1;
 	super_courant->first_free = 1;
-	super_courant->inode = 0;
+	super_courant->root = 0;
 	write_super_bloc(vol, super_courant);
 
 	free_blc = (struct free_bloc_s *)malloc(sizeof(struct free_bloc_s));
@@ -172,7 +169,7 @@ void print_super(){
 	printf("Super courant :\n");
 	printf("magic        : %x\n", super_courant->magic);
 	printf("serial       : %x\n", super_courant->serial);
-	printf("inode        : %d\n", super_courant->inode);
+	printf("Racine       : %d\n", super_courant->root);
 	printf("nb_free_bloc : %d\n", super_courant->nb_free_blc);
 	printf("first_free   : %d\n", super_courant->first_free);
 	printf("name         : %s\n", super_courant->name);

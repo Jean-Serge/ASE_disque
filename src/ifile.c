@@ -222,7 +222,9 @@ int read_ifile(file_desc_t *fd, void *buf, unsigned int nbyte){
 			break;                /* fin du fichier, on stoppe */
 		tmp[i] = c;
 	}
-	buf = tmp;
+	
+	memcpy(buf, tmp, nbyte);
+	free(tmp);
 	if(c == READ_EOF)
 	  return c;
 	return i;
@@ -234,7 +236,6 @@ int write_ifile(file_desc_t *fd, const void *buf, unsigned int nbyte){
 	for(i = 0; i < nbyte; i++){
 		writec_ifile(fd, tmp[i]);
 	}
-	free(tmp);
 	return i;
 }
 
