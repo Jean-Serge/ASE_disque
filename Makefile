@@ -63,8 +63,8 @@ dvol: volume drive ${SRCDIR}dvol.c
 mkvol: volume drive ${SRCDIR}mkvol.c
 	$(CC) $(CFLAGS) -o mkvol${SUFFIX} drive.o volume.o tools.o ${SRCDIR}mkvol.c ${LIBS}
 
-mknfs: volume drive filesystem tools ${SRCDIR}mknfs.c
-	$(CC) $(CFLAGS) -o mknfs${SUFFIX} drive.o volume.o filesystem.o tools.o ${SRCDIR}mknfs.c ${LIBS}
+mknfs: volume drive filesystem tools ifile ${SRCDIR}mknfs.c
+	$(CC) $(CFLAGS) -o mknfs${SUFFIX} drive.o volume.o filesystem.o tools.o dir.o ifile.o ${SRCDIR}mknfs.c ${LIBS}
 
 print_mbr: volume drive ${SRCDIR}print_mbr.c
 	$(CC) $(CFLAGS) -o print_mbr${SUFFIX} drive.o volume.o tools.o ${SRCDIR}print_mbr.c ${LIBS}
@@ -91,16 +91,16 @@ test_file: dir ifile file ${SRCDIR}test_file.c
 	$(CC) $(CFLAGS) -o test_file${SUFFIX} drive.o volume.o filesystem.o ifile.o file.o dir.o tools.o ${SRCDIR}test_file.c ${LIBS}
 
 shell:  cmd ${SRCDIR}shell.c
-	$(CC) $(CFLAGS) -o shell${SUFFIX} cmd.o my_ls.o my_cd.o my_pwd.o ${SRCDIR}shell.c 
+	$(CC) $(CFLAGS) -o shell${SUFFIX} cmd.o my_ls.o my_cd.o my_pwd.o ${SRCDIR}shell.c
 
 my_ls: ${SRCDIR}my_ls.c ${SRCDIR}my_ls.h
-	$(CC) $(CFLAGS) -o my_ls.o -c ${SRCDIR}my_ls.c 
+	$(CC) $(CFLAGS) -o my_ls.o -c ${SRCDIR}my_ls.c
 
 my_cd: ${SRCDIR}my_cd.c ${SRCDIR}my_cd.h
-	$(CC) $(CFLAGS) -o my_cd.o -c ${SRCDIR}my_cd.c 
+	$(CC) $(CFLAGS) -o my_cd.o -c ${SRCDIR}my_cd.c
 
 my_pwd: ${SRCDIR}my_pwd.c ${SRCDIR}my_pwd.h
-	$(CC) $(CFLAGS) -o my_pwd.o -c ${SRCDIR}my_pwd.c 
+	$(CC) $(CFLAGS) -o my_pwd.o -c ${SRCDIR}my_pwd.c
 
 cmd: my_cd my_ls my_pwd ${SRCDIR}cmd.c ${SRCDIR}cmd.h
 	$(CC) $(CFLAGS) -o cmd.o -c ${SRCDIR}cmd.c
