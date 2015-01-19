@@ -3,6 +3,7 @@
 #include "drive.h"
 #include "volume.h"
 #include "filesystem.h"
+#include "ifile.h"
 
 #define ENV_VAR_NAME "CURRENT_VOLUME"
 
@@ -15,9 +16,11 @@
 int main(int argc, char *argv[]){
 	char *endptr;
 	char *env_value;
-	char name[SUPER_SZ_NAME];
+	char name[SUPER_SZ_NAME+1];
 	int crt_vol;
 	struct mbr_s *mbr;
+	struct superbloc_s *super;
+	int inumber;
 	env_value = getenv(ENV_VAR_NAME);
 	if(!env_value){
 		fprintf(stderr, "Pas de variable d'environement $%s\n", ENV_VAR_NAME);
@@ -52,9 +55,16 @@ int main(int argc, char *argv[]){
 	if(argc == 2){
 		printf(" avec comme nom de volume: \"%s\".\n", name);
 		init_super(crt_vol, name);
-		return 0;
 	}
-	printf(".\n");
-	init_super(crt_vol, NULL);
+	else{
+		printf(".\n");
+		init_super(crt_vol, NULL);
+	}
+	inumber = create_ifile(DIRECTORY);
+	load_super(crt_vol);
+	super = get_super();
+	super->root = inumber;
+	printf("Inumber %d\n", inumber);
+	write_super_bloc(crt_vol, super);
 	return 0;
 }

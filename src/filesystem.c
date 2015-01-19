@@ -83,6 +83,8 @@ void write_super_bloc(unsigned int vol, struct superbloc_s *super_blc){
 		buf[12+i] = super_blc->name[i];
 		i++;
 	}
+	buf[12+SUPER_SZ_NAME] = super_blc->root>>8;
+	buf[12+SUPER_SZ_NAME+1] = ((super_blc->root<<8)>>8) & 0xFF;
 	write_bloc(vol, 0, buf);
 }
 
@@ -117,6 +119,7 @@ struct superbloc_s *read_super_bloc(unsigned int vol){
 	/* lecture du nom du volume */
 	super->name = (char *)calloc(SUPER_SZ_NAME, sizeof(char));
 	super->name = strncpy(super->name, buf+12, SUPER_SZ_NAME);
+	super->root = (buf[12+SUPER_SZ_NAME] <<8) + (buf[12+SUPER_SZ_NAME+1] & 0xFF);
 	return super;
 }
 

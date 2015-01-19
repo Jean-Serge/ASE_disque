@@ -33,7 +33,10 @@ struct superbloc_s{
 	int nb_free_blc;    /* 2 octets */
 	int first_free;     /* le premier bloc libre sur le disque : 2 octets */
 	char *name;         /* 32 octets */
+	int root;           /* Inumber du répertoire racine */
 };
+
+extern void write_super_bloc(unsigned int vol, struct superbloc_s *super_blc);
 
 extern void init_super(unsigned int vol, char *name);
 

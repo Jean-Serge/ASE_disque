@@ -16,7 +16,7 @@ SUFFIX  = .bin
 ### Main targets
 ###------------------------------------------------------------
 BINARIES= create-disk${SUFFIX} dmps${SUFFIX} dvol${SUFFIX} frmt${SUFFIX} mkvol${SUFFIX} print_mbr${SUFFIX} mknfs${SUFFIX} test_file${SUFFIX}\
-rvol${SUFFIX} tfs${SUFFIX} if_status${SUFFIX} if_pfile${SUFFIX} if_cfile${SUFFIX} if_nfile${SUFFIX} if_dfile${SUFFIX}
+rvol${SUFFIX} tfs${SUFFIX} if_status${SUFFIX} if_pfile${SUFFIX} if_cfile${SUFFIX} if_nfile${SUFFIX} if_dfile${SUFFIX} test_convert_blc${SUFFIX}
 OBJECTS= $(addsuffix .o,\
 	  mkhd)
 
@@ -95,15 +95,15 @@ if_cfile: ifile ${SRCDIR}if_cfile.c
 ### Testing rules
 ###------------------------------------------------------------
 tconvert_blc: volume drive ${SRCDIR}test_convert_blc.c
-	$(CC) $(CFLAGS) -o test_convert_blc${SUFFIX} drive.o volume.o ${SRCDIR}test_convert_blc.c ${LIBS}
+	$(CC) $(CFLAGS) -o test_convert_blc${SUFFIX} drive.o volume.o tools.o ${SRCDIR}test_convert_blc.c ${LIBS}
 
 tfilesystem: filesystem volume drive ${SRCDIR}test_filesystem.c
-	$(CC) $(CFLAGS) -o tfs${SUFFIX} drive.o volume.o  filesystem.o ${SRCDIR}test_filesystem.c ${LIBS}
+	$(CC) $(CFLAGS) -o tfs${SUFFIX} drive.o volume.o  filesystem.o tools.o ${SRCDIR}test_filesystem.c ${LIBS}
 
 tfile: file drive volume filesystem volume ${SRCDIR}test_file.c
-	$(CC) $(CFLAGS) -o tfile${SUFFIX} drive.o volume.o  filesystem.o file.o ${SRCDIR}test_file.c ${LIBS}
+	$(CC) $(CFLAGS) -o tfile${SUFFIX} drive.o volume.o  filesystem.o file.o tools.o ${SRCDIR}test_file.c ${LIBS}
 
-test_file: dir ifile file ${SRCDIR}test_file.c
+test_file: dir ifile file tools ${SRCDIR}test_file.c
 	$(CC) $(CFLAGS) -o test_file${SUFFIX} drive.o volume.o filesystem.o ifile.o file.o dir.o tools.o ${SRCDIR}test_file.c ${LIBS}
 
 
