@@ -88,11 +88,15 @@ add_entry(unsigned int idir, unsigned int inumber, const char *basename)
 
     /* the new entry position in the file */
     ientry = new_entry(fd);
-
     /* built the entry */
     entry.ent_inumber = inumber;
+
     strncpy(entry.ent_basename, basename, ENTRYMAXLENGTH);
+    print_fd(fd);
+
     entry.ent_basename[ENTRYMAXLENGTH] = 0;
+    printf("%p \t %p", &(fd->inoeud), entry.ent_basename);
+    print_fd(fd);
 
     /* seek to the right position */
     seek2_ifile(fd, ientry * sizeof(struct entry_s));

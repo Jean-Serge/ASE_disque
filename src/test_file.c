@@ -22,7 +22,7 @@ int main(int argc, char *argv[]){
 
   mkhd();
   mount(0);
-  printf("Toto");
+  printf("Toto");fflush(stdout);
   i = create_file("/toto", NORMAL);
   printf("create : %d\n", i);fflush(stdout);
   /* printf("open   : %d\n",open_file(&fd, "/toto")); */

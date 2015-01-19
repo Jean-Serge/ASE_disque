@@ -223,6 +223,8 @@ int read_ifile(file_desc_t *fd, void *buf, unsigned int nbyte){
 		tmp[i] = c;
 	}
 	buf = tmp;
+	if(c == READ_EOF)
+	  return c;
 	return i;
 }
 
