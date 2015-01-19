@@ -22,7 +22,9 @@ OBJECTS= $(addsuffix .o,\
 
 #all: $(BINARIES) $(OBJECTS)
 all: create-disk dmps frmt drive volume filesystem ifile dvol print_mbr mkvol mknfs rvol\
-if_status if_pfile if_nfile if_dfile if_cfile test_file
+if_status if_pfile if_nfile if_dfile if_cfile
+
+test: tconvert_blc tfilesystem tfilesystem test_file
 
 ###------------------------------
 ### Main rules
