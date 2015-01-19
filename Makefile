@@ -16,7 +16,7 @@ SUFFIX  = .bin
 ### Main targets
 ###------------------------------------------------------------
 BINARIES= create-disk${SUFFIX} dmps${SUFFIX} dvol${SUFFIX} frmt${SUFFIX} mkvol${SUFFIX} print_mbr${SUFFIX} mknfs${SUFFIX} test_file${SUFFIX}\
-rvol${SUFFIX} tfs${SUFFIX} if_status${SUFFIX} if_pfile${SUFFIX} if_cfile${SUFFIX} if_nfile${SUFFIX} if_dfile${SUFFIX} shell${SUFFIX}
+rvol${SUFFIX} tfs${SUFFIX} if_status${SUFFIX} if_pfile${SUFFIX} if_cfile${SUFFIX} if_nfile${SUFFIX} if_dfile${SUFFIX}
 OBJECTS= $(addsuffix .o,\
 	  mkhd)
 
@@ -64,7 +64,7 @@ mkvol: volume drive ${SRCDIR}mkvol.c
 	$(CC) $(CFLAGS) -o mkvol${SUFFIX} drive.o volume.o tools.o ${SRCDIR}mkvol.c ${LIBS}
 
 mknfs: volume drive filesystem tools ifile ${SRCDIR}mknfs.c
-	$(CC) $(CFLAGS) -o mknfs${SUFFIX} drive.o volume.o filesystem.o tools.o dir.o ifile.o ${SRCDIR}mknfs.c ${LIBS}
+	$(CC) $(CFLAGS) -o mknfs${SUFFIX} drive.o volume.o filesystem.o tools.o ifile.o ${SRCDIR}mknfs.c ${LIBS}
 
 print_mbr: volume drive ${SRCDIR}print_mbr.c
 	$(CC) $(CFLAGS) -o print_mbr${SUFFIX} drive.o volume.o tools.o ${SRCDIR}print_mbr.c ${LIBS}
@@ -87,28 +87,11 @@ if_dfile: ifile ${SRCDIR}if_dfile.c
 if_cfile: ifile ${SRCDIR}if_cfile.c
 	$(CC) $(CFLAGS) -o if_cfile${SUFFIX} drive.o volume.o filesystem.o ifile.o tools.o ${SRCDIR}if_cfile.c ${LIBS}
 
-test_file: dir ifile file ${SRCDIR}test_file.c
-	$(CC) $(CFLAGS) -o test_file${SUFFIX} drive.o volume.o filesystem.o ifile.o file.o dir.o tools.o ${SRCDIR}test_file.c ${LIBS}
 
-shell:  cmd ${SRCDIR}shell.c
-	$(CC) $(CFLAGS) -o shell${SUFFIX} cmd.o my_ls.o my_cd.o my_pwd.o ${SRCDIR}shell.c
-
-my_ls: ${SRCDIR}my_ls.c ${SRCDIR}my_ls.h
-	$(CC) $(CFLAGS) -o my_ls.o -c ${SRCDIR}my_ls.c
-
-my_cd: ${SRCDIR}my_cd.c ${SRCDIR}my_cd.h
-	$(CC) $(CFLAGS) -o my_cd.o -c ${SRCDIR}my_cd.c
-
-my_pwd: ${SRCDIR}my_pwd.c ${SRCDIR}my_pwd.h
-	$(CC) $(CFLAGS) -o my_pwd.o -c ${SRCDIR}my_pwd.c
-
-cmd: my_cd my_ls my_pwd ${SRCDIR}cmd.c ${SRCDIR}cmd.h
-	$(CC) $(CFLAGS) -o cmd.o -c ${SRCDIR}cmd.c
 
 ###------------------------------
 ### Testing rules
 ###------------------------------------------------------------
-
 tconvert_blc: volume drive ${SRCDIR}test_convert_blc.c
 	$(CC) $(CFLAGS) -o test_convert_blc${SUFFIX} drive.o volume.o ${SRCDIR}test_convert_blc.c ${LIBS}
 
@@ -117,6 +100,9 @@ tfilesystem: filesystem volume drive ${SRCDIR}test_filesystem.c
 
 tfile: file drive volume filesystem volume ${SRCDIR}test_file.c
 	$(CC) $(CFLAGS) -o tfile${SUFFIX} drive.o volume.o  filesystem.o file.o ${SRCDIR}test_file.c ${LIBS}
+
+test_file: dir ifile file ${SRCDIR}test_file.c
+	$(CC) $(CFLAGS) -o test_file${SUFFIX} drive.o volume.o filesystem.o ifile.o file.o dir.o tools.o ${SRCDIR}test_file.c ${LIBS}
 
 
 ###------------------------------
