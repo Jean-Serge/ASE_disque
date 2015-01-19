@@ -49,7 +49,7 @@ int open_ifile(file_desc_t *fd, unsigned int inumber){
 	fd->closed   = NO;
 	fd->type     = inode.type;
 	fd->file_buffer = (unsigned char *)
-	                  calloc(sizeof(unsigned char),  HDA_SECTORSIZE);
+	                  calloc( HDA_SECTORSIZE, sizeof(unsigned char));
 	/* Lecture du premier bloc d'adressage direct */
 	if(frst_blc != NULL_BLOC){
 		read_bloc(vol_courant, frst_blc, buf);
@@ -67,7 +67,12 @@ extern int iopen_ifile(file_desc_t *fd, unsigned int inumber,
 	fd->inoeud = inumber;
 	fd->cursor = 0;
 	fd->size = inode->taille;
-
+	fd->modified = NO;
+	fd->closed   = NO;
+	fd->type     = inode->type;
+	fd->file_buffer = (unsigned char *)
+	                  calloc( HDA_SECTORSIZE, sizeof(unsigned char));
+	
 	/* Réinitialisation du tampon du file descriptor */
 	first_bloc = vbloc_of_fbloc(inumber, 0);
 	if(first_bloc == 0){

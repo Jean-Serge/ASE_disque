@@ -22,12 +22,13 @@ int main(int argc, char *argv[]){
 
   mkhd();
   mount(0);
+  printf("Toto");
   i = create_file("/toto", NORMAL);
   printf("create : %d\n", i);fflush(stdout);
   /* printf("open   : %d\n",open_file(&fd, "/toto")); */
   print_fd(&fd);
-  close_file(&fd);
-  printf("3\n");
+  /* close_file(&fd); */
+  /* printf("3\n"); */
 
   /* fd = create_file("Bonjour", DIRECTORY); */
   /* writec_file(fd, 'Z'); */
