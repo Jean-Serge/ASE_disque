@@ -11,28 +11,6 @@
 #define ERR_OPT  2
 #define ERR_NEG  3
 
-/* void dmps(unsigned int cyl, unsigned int sec, unsigned char *buffer){ */
-/* 	struct disk_info_s *dinfo = get_disk_info(); */
-/* 	int i = 0; */
-/* 	if(!is_correct_coordinates(sec, cyl)){ */
-/* 		fprintf(stderr, "Au moins une des coordonnées passé en paramêtres est hors limite.\n"); */
-/* 		fprintf(stderr, "Les valeurs autorisé pour les cylindres vont de 0 à %d exclu.\n", dinfo->nb_cyl); */
-/* 		fprintf(stderr, "Les valeurs autorisé pour les secteurs vont de 0 à %d exclu.\n", dinfo->nb_sec); */
-/* 		exit(ERR_COOR); */
-/* 	} */
-
-/* 	move_head(cyl, sec); */
-
-/* 	/\* Demande de données du disque *\/ */
-/* 	_out_16bits(HDA_DATAREGS, 1); */
-/* 	_out(HDA_CMDREG, CMD_READ); */
-
-/* 	/\* Attente de l'IRQ *\/ */
-/* 	_sleep(HDA_IRQ); */
-/* 	for(; i < HDA_SECTORSIZE; i++) */
-/* 		buffer[i] = MASTERBUFFER[i]; */
-/* } */
-
 void usage(){
 	printf("Affichage d'un secteur du disque.\n");
 	printf("Si plusieurs option d'affichage sont passé en paramêtres, seul la dernière est prise en compte.\n");
@@ -102,6 +80,7 @@ int main(int argc, char **argv){
 	for(; i < HDA_SECTORSIZE; i++){
 		printf(str_print, buffer[i]);
 	}
+	printf("\n");
 	free(buffer);
 
 	exit(SUCCESS);
