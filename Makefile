@@ -35,7 +35,7 @@ create-disk: drive ${SRCDIR}create_disk.c
 dmps: drive volume ${SRCDIR}dmps.c
 	$(CC) $(CFLAGS) -o dmps${SUFFIX} drive.o ${SRCDIR}dmps.c ${LIBS}
 
-frmt: drive volume.o ${SRCDIR}frmt.c
+frmt: drive volume ${SRCDIR}frmt.c
 	$(CC) $(CFLAGS) -o frmt${SUFFIX} drive.o volume.o tools.o ${SRCDIR}frmt.c ${LIBS}
 
 drive: ${SRCDIR}drive.c ${SRCDIR}drive.h
