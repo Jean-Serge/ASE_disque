@@ -17,20 +17,23 @@
 
 int main(int argc, char *argv[]){
   int i;
-  file_desc_t fd;
   /* const char* s = "Salut c'est moi."; */
+  file_desc_t fd;
+  unsigned char buf[9] /* = {'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I'} */;
 
   mkhd();
   mount(0);
-  i = create_file("/toto", NORMAL);
+  i = create_file("/toto", DIRECTORY);
   printf("create : %d\n", i);fflush(stdout);
-  printf("open   : %d\n",open_file(&fd, "/toto"));
-  print_fd(&fd);
-  close_file(&fd);
-  print_fd(&fd);
-  /* printf("3\n"); */
+  i = create_file("/toto/maman", NORMAL);
+  printf("create : %d\n", i);fflush(stdout);
 
-  /* fd = create_file("Bonjour", DIRECTORY); */
-  /* writec_file(fd, 'Z'); */
+  open_file(&fd, "/toto/maman");
+
+  /* /\* write_file(&fd, (void *)&buf, 9); *\/ */
+  /* read_file(&fd, (void *)&buf, 9); */
+  /* printf("%s\n", buf); */
+  close_file(&fd);
+
   return EXIT_SUCCESS;
 }
